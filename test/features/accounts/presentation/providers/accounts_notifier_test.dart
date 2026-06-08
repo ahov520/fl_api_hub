@@ -427,8 +427,8 @@ void main() {
 
           final captured = verify(() => mockRepo.update(captureAny())).captured;
           final patched = captured.single as Account;
-          // (500_000_000 - 1_000_000) / 500_000 = 998.0
-          expect(patched.balance, equals(998.0));
+          // 500_000_000 / 500_000 = 1000.0 (quota is already remaining; no subtraction)
+          expect(patched.balance, equals(1000.0));
           expect(patched.username, equals('alice'));
           expect(patched.userId, equals(42));
         },
@@ -473,8 +473,8 @@ void main() {
 
           final captured = verify(() => mockRepo.update(captureAny())).captured;
           final patched = captured.single as Account;
-          // (1_000_000 - 500_000) / kDefaultQuotaPerUnit (500_000) = 1.0
-          expect(patched.balance, equals(1.0));
+          // 1_000_000 / kDefaultQuotaPerUnit (500_000) = 2.0 (no used_quota subtraction)
+          expect(patched.balance, equals(2.0));
           expect(patched.username, equals('bob'));
           expect(patched.userId, equals(5));
         },
@@ -518,8 +518,8 @@ void main() {
 
           final captured = verify(() => mockRepo.update(captureAny())).captured;
           final patched = captured.single as Account;
-          // (2_000_000 - 500_000) / kDefaultQuotaPerUnit (500_000) = 3.0
-          expect(patched.balance, equals(3.0));
+          // 2_000_000 / kDefaultQuotaPerUnit (500_000) = 4.0 (no used_quota subtraction)
+          expect(patched.balance, equals(4.0));
         },
       );
 
@@ -597,7 +597,7 @@ void main() {
 
           final captured = verify(() => mockRepo.update(captureAny())).captured;
           final patched = captured.single as Account;
-          expect(patched.balance, equals(998.0));
+          expect(patched.balance, equals(1000.0));
           expect(patched.username, equals('pre-set'));
           expect(patched.userId, equals(999));
         },
@@ -609,7 +609,7 @@ void main() {
           final already = testAccount.copyWith(
             username: 'alice',
             userId: 42,
-            balance: 998.0,
+            balance: 1000.0,
           );
           when(() => mockRemote.fetchAccountInfo(any())).thenAnswer(
             (_) async => Success(

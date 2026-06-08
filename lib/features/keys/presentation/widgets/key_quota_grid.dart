@@ -72,7 +72,9 @@ class KeyQuotaGrid extends StatelessWidget {
 
   String get _remainingQuota {
     if (apiKey.quota == null) return '无限额度';
-    final remaining = (apiKey.quota! - apiKey.usedQuota) / kDefaultQuotaPerUnit;
+    // `quota` already holds the server's remaining balance (`remain_quota`);
+    // do NOT subtract `usedQuota` again — that would double-deduct usage.
+    final remaining = apiKey.quota! / kDefaultQuotaPerUnit;
     return '\$${remaining.toStringAsFixed(2)}';
   }
 

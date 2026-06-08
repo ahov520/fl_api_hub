@@ -1,0 +1,1 @@
+{"file": ".trellis/tasks/06-09-fix-balance-double-deduction/research/balance-data-flow.md", "reason": "检查阶段据此核对：3 处计算是否已去除 used_quota 扣减、测试断言新值是否正确、Sub2API/unlimited 兼容性是否保持"}

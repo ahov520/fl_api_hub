@@ -41,8 +41,10 @@ void main() {
       expect(key.expiresAt, isNull);
     });
 
-    test('remainingQuota calculates correctly', () {
-      expect(testKey.remainingQuota, 800);
+    test('remainingQuota returns quota directly (already remaining)', () {
+      // `quota` already holds the server's remain_quota; `usedQuota` is NOT
+      // subtracted, so remainingQuota equals quota (1000), not 800.
+      expect(testKey.remainingQuota, 1000);
 
       final unlimited = ApiKey(
         id: 'id',

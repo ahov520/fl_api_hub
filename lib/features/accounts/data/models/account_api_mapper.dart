@@ -35,18 +35,17 @@ class AccountApiMapper {
   /// Priority:
   /// 1. If the site explicitly returns `balance` (rare — a few forks do),
   ///    the DTO value is trusted as-is.
-  /// 2. Otherwise, derives it as `(quota - used_quota) / quotaPerUnit`,
-  ///    which matches the New API family convention where `quota` is
-  ///    tracked in token units.
+  /// 2. Otherwise, derives it as `quota / quotaPerUnit`. In the New API
+  ///    family `quota` already represents the *remaining* balance in token
+  ///    units, so the historical `used_quota` must NOT be subtracted again.
   ///
   /// Returns `null` when the required inputs are missing or invalid
-  /// (e.g. `quota`/`usedQuota` absent, or `quotaPerUnit <= 0`).
+  /// (e.g. `quota` absent, or `quotaPerUnit <= 0`).
   static double? computeBalance(UserInfoDto dto, double quotaPerUnit) {
     if (dto.balance != null) return dto.balance;
     final quota = dto.quota;
-    final usedQuota = dto.usedQuota;
-    if (quota == null || usedQuota == null) return null;
+    if (quota == null) return null;
     if (quotaPerUnit <= 0) return null;
-    return (quota - usedQuota) / quotaPerUnit;
+    return quota / quotaPerUnit;
   }
 }

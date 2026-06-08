@@ -16,7 +16,8 @@ class UserInfoDto {
   /// Email address.
   final String? email;
 
-  /// Total quota allocation.
+  /// Remaining quota in token units — already the available balance, NOT the
+  /// total allocation. New API family convention (`used_quota` is separate).
   final double? quota;
 
   /// Quota already consumed.

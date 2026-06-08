@@ -20,7 +20,9 @@ class ApiKey {
   /// Stored in plaintext as part of the entity on local persistence.
   final String? keyValue;
 
-  /// Quota limit for this key. `null` means unlimited.
+  /// Remaining quota for this key — maps from the server's `remain_quota`,
+  /// which is already the available balance (NOT the total allocation).
+  /// `null` means unlimited.
   final int? quota;
 
   /// Amount of quota already consumed.
@@ -78,8 +80,10 @@ class ApiKey {
     );
   }
 
-  /// Remaining quota. `null` if quota is unlimited.
-  int? get remainingQuota => quota != null ? quota! - usedQuota : null;
+  /// Remaining quota. `quota` already holds the server's `remain_quota`
+  /// (the available balance), so it is returned directly — `used_quota` is
+  /// NOT subtracted. `null` if quota is unlimited.
+  int? get remainingQuota => quota;
 
   /// Whether this key has expired.
   bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);

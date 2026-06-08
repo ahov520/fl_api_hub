@@ -69,16 +69,20 @@ void main() {
         expect(AccountApiMapper.computeBalance(dto, 500000), equals(12.34));
       });
 
-      test('derives balance from quota - usedQuota / quotaPerUnit', () {
-        final dto = UserInfoDto(quota: 500000000, usedQuota: 1000000);
-        // (500_000_000 - 1_000_000) / 500_000 = 998.0
-        expect(AccountApiMapper.computeBalance(dto, 500000), equals(998.0));
-      });
+      test(
+        'derives balance from quota / quotaPerUnit (no used_quota subtraction)',
+        () {
+          final dto = UserInfoDto(quota: 500000000, usedQuota: 1000000);
+          // `quota` is already the remaining balance: 500_000_000 / 500_000 = 1000.0
+          // `used_quota` must NOT be subtracted again.
+          expect(AccountApiMapper.computeBalance(dto, 500000), equals(1000.0));
+        },
+      );
 
       test('uses site-reported quotaPerUnit override', () {
         final dto = UserInfoDto(quota: 2000000, usedQuota: 500000);
-        // (2_000_000 - 500_000) / 250_000 = 6.0
-        expect(AccountApiMapper.computeBalance(dto, 250000), equals(6.0));
+        // 2_000_000 / 250_000 = 8.0 (used_quota ignored)
+        expect(AccountApiMapper.computeBalance(dto, 250000), equals(8.0));
       });
 
       test('returns null when quota is missing', () {
@@ -86,9 +90,13 @@ void main() {
         expect(AccountApiMapper.computeBalance(dto, 500000), isNull);
       });
 
-      test('returns null when usedQuota is missing', () {
+      test('computes balance even when usedQuota is missing', () {
         final dto = UserInfoDto(quota: 1000.0);
-        expect(AccountApiMapper.computeBalance(dto, 500000), isNull);
+        // `used_quota` is no longer required: 1000 / 500000 = 0.002
+        expect(
+          AccountApiMapper.computeBalance(dto, 500000),
+          closeTo(0.002, 1e-9),
+        );
       });
 
       test('returns null when both quota and usedQuota missing', () {
@@ -106,9 +114,10 @@ void main() {
         expect(AccountApiMapper.computeBalance(dto, -1), isNull);
       });
 
-      test('allows negative derived balance (overused quota)', () {
-        final dto = UserInfoDto(quota: 1000.0, usedQuota: 2000.0);
-        expect(AccountApiMapper.computeBalance(dto, 500), equals(-2.0));
+      test('ignores used_quota entirely (no double deduction)', () {
+        // Even a large used_quota does not reduce the reported balance.
+        final dto = UserInfoDto(quota: 1000.0, usedQuota: 999999.0);
+        expect(AccountApiMapper.computeBalance(dto, 500), equals(2.0));
       });
     });
 
