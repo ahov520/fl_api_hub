@@ -10,10 +10,13 @@
 ///   entry) are dropped by [checkInAccountSummariesProvider].
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:fl_api_hub/core/network/site_type.dart';
@@ -83,6 +86,7 @@ CheckInTask _task({required String id, required String accountId}) {
 
 void main() {
   late _MockCheckInRepository repo;
+  late Directory tempDir;
 
   setUpAll(() {
     registerFallbackValue(
@@ -96,7 +100,14 @@ void main() {
     );
   });
 
-  setUp(() {
+  setUp(() async {
+    // The wide layout mounts a SplitPane, which reads the Hive-backed
+    // splitPaneRatioProvider. Initialize a throwaway Hive store so that read
+    // resolves instead of throwing "Box not found".
+    tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+    await Hive.openBox('app_data');
+
     repo = _MockCheckInRepository();
     // Default stubs so every provider read resolves cleanly.
     when(
@@ -114,6 +125,11 @@ void main() {
         offset: any(named: 'offset'),
       ),
     ).thenAnswer((_) async => const Success<List<CheckInResult>>([]));
+  });
+
+  tearDown(() async {
+    await Hive.close();
+    await tempDir.delete(recursive: true);
   });
 
   /// Pumps the page at the given viewport size with the given fake

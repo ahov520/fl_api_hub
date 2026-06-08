@@ -3,7 +3,7 @@
   "name": "fix-preexisting-ui-test-failures",
   "title": "修复 check_in 与 request_logger 预存测试失败",
   "description": "",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,

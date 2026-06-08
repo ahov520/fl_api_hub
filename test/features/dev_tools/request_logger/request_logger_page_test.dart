@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import 'package:fl_api_hub/features/dev_tools/request_logger/domain/entities/request_log_entry.dart';
 import 'package:fl_api_hub/features/dev_tools/request_logger/presentation/pages/request_logger_page.dart';
@@ -39,12 +42,31 @@ Widget _wrap({required ProviderContainer container, Size? size}) {
 }
 
 void main() {
+  late Directory tempDir;
+
+  setUp(() async {
+    // The wide layout mounts a SplitPane, which reads the Hive-backed
+    // splitPaneRatioProvider. Initialize a throwaway Hive store so that read
+    // resolves instead of throwing "Box not found".
+    tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+    await Hive.openBox('app_data');
+  });
+
+  tearDown(() async {
+    await Hive.close();
+    await tempDir.delete(recursive: true);
+  });
+
   group('RequestLoggerPage — empty states', () {
     testWidgets('switch off + empty buffer shows "尚未开启" message', (
       tester,
     ) async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
+      // requestLoggerEnabledProvider defaults to kDebugMode (true under
+      // `flutter test`); force it off to exercise the "尚未开启" empty state.
+      container.read(requestLoggerEnabledProvider.notifier).state = false;
 
       await tester.pumpWidget(_wrap(container: container));
 
@@ -164,6 +186,9 @@ void main() {
     ) async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
+      // Pin a known starting state (default is kDebugMode, true under tests)
+      // so tapping the switch deterministically flips it on.
+      container.read(requestLoggerEnabledProvider.notifier).state = false;
 
       await tester.pumpWidget(_wrap(container: container));
       await tester.tap(find.byType(Switch).first);

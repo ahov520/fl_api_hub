@@ -174,7 +174,6 @@ class _AccountEditPageState extends ConsumerState<AccountEditPage> {
               dirtyNotifier: _dirtyNotifier,
               siteTypeNotifier: _siteTypeNotifier,
             ),
-            // bottomNavigationBar: _buildAuxBar(),
             floatingActionButton: _buildFabGroup(isDirty, isEditing),
           ),
         );
@@ -231,53 +230,6 @@ class _AccountEditPageState extends ConsumerState<AccountEditPage> {
           ),
         ],
       ],
-    );
-  }
-
-  // TODO 目前功能没用上，先隐藏，待实现
-  /// Auxiliary action bar: re-detect + auto-config (placeholders).
-  Widget _buildAuxBar() {
-    return ValueListenableBuilder<SiteType>(
-      valueListenable: _siteTypeNotifier,
-      builder: (context, siteType, _) {
-        return SafeArea(
-          top: false,
-          child: BottomAppBar(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    key: const ValueKey('reDetectButton'),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('自动识别功能即将上线～')),
-                      );
-                    },
-                    child: const Text('重新识别'),
-                  ),
-                ),
-                if (siteType.isManaged) ...[
-                  const SizedBox(width: AppSpacing.sm),
-                  IconButton.filledTonal(
-                    key: const ValueKey('autoConfigButton'),
-                    tooltip: '保存并配置',
-                    icon: const Icon(Icons.rocket_launch),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('保存并配置功能即将上线～')),
-                      );
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

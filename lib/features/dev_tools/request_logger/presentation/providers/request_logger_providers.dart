@@ -3,8 +3,8 @@
 /// Three pieces of state plus one derived view:
 ///
 /// - [requestLoggerEnabledProvider] — the on/off switch. A plain
-///   `StateProvider<bool>`; not persisted, defaults to `false` on every
-///   cold start.
+///   `StateProvider<bool>`; not persisted, defaults to `kDebugMode` on every
+///   cold start (locked on in debug builds).
 /// - [requestLogBufferProvider] — the 500-entry FIFO ring buffer backed by
 ///   a `ListQueue` so `addLast` / `removeFirst` stay O(1). Exposes
 ///   `add(entry)` and `clear()` methods through its `Notifier`.

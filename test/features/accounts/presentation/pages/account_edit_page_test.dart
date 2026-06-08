@@ -137,7 +137,7 @@ void main() {
         await tester.tap(find.text('New API').last);
         await tester.pumpAndSettle();
 
-        // NOTE: auto-config button is currently hidden (bottomNavigationBar commented out).
+        // NOTE: auto-config button is not implemented yet (auxiliary action bar removed).
         // When re-enabled, this expectation should be findsOneWidget.
         expect(find.byKey(const ValueKey('autoConfigButton')), findsNothing);
 
@@ -149,7 +149,7 @@ void main() {
 
         expect(find.byKey(const ValueKey('autoConfigButton')), findsNothing);
       },
-      skip: true, // bottomNavigationBar (_buildAuxBar) is currently disabled
+      skip: true, // aux action bar not implemented yet
     );
 
     testWidgets(
@@ -181,7 +181,7 @@ void main() {
         await tester.pump();
         expect(find.text('保存并配置功能即将上线～'), findsOneWidget);
       },
-      skip: true, // bottomNavigationBar (_buildAuxBar) is currently disabled
+      skip: true, // aux action bar not implemented yet
     );
 
     testWidgets('save in add mode creates account and triggers checkOne', (

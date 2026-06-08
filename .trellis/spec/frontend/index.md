@@ -21,6 +21,7 @@ This directory contains guidelines for frontend development. Fill in each file w
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
 | [Theme Guidelines](./theme-guidelines.md) | Dynamic color, Monet pipeline, surface tokens | Active |
 | [Type Safety](./type-safety.md) | Type patterns, validation | To fill |
+| [Testing Guidelines](./testing-guidelines.md) | Widget test setup: Hive init, `kDebugMode` providers, disguised render errors | Active |
 
 ---
 
