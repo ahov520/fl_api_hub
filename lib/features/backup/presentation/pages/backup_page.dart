@@ -6,11 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../accounts/presentation/providers/accounts_providers.dart';
+import '../../../tags/presentation/providers/tags_providers.dart';
 import '../../data/datasources/backup_file_datasource.dart';
 import '../../domain/entities/backup_progress.dart';
 import '../providers/backup_providers.dart';
 import '../providers/backup_state.dart';
+import '../providers/plugin_import_providers.dart';
+import '../providers/plugin_import_state.dart';
 import 'backup_password_dialog.dart';
+import 'plugin_import_result_page.dart';
 import 'restore_mode_dialog.dart';
 import 'restore_result_page.dart';
 
@@ -20,6 +25,7 @@ class BackupPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(backupProvider);
+    final pluginState = ref.watch(pluginImportProvider);
 
     ref.listen<BackupState>(backupProvider, (_, next) {
       if (next is BackupError) {
@@ -30,6 +36,18 @@ class BackupPage extends ConsumerWidget {
           ),
         );
         ref.read(backupProvider.notifier).reset();
+      }
+    });
+
+    ref.listen<PluginImportState>(pluginImportProvider, (_, next) {
+      if (next is PluginImportError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.exception.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        ref.read(pluginImportProvider.notifier).reset();
       }
     });
 
@@ -80,6 +98,29 @@ class BackupPage extends ConsumerWidget {
                 ),
                 if (state is BackupInProgress && state.op == BackupOp.restore)
                   _InlineProgress(progress: state.progress),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SectionCard(
+            icon: Icons.extension_outlined,
+            title: '从浏览器插件导入',
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.download_for_offline_outlined),
+                  title: const Text('导入 All-API-Hub 插件数据'),
+                  subtitle: const Text('从浏览器插件导出的账号文件合并追加账号与标签'),
+                  trailing: pluginState is PluginImportInProgress
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right),
+                  enabled: pluginState is! PluginImportInProgress,
+                  onTap: () => _onImportPlugin(context, ref),
+                ),
               ],
             ),
           ),
@@ -190,6 +231,38 @@ class BackupPage extends ConsumerWidget {
       // Reset state after user returns from result page.
       if (context.mounted) {
         ref.read(backupProvider.notifier).reset();
+      }
+    }
+  }
+
+  Future<void> _onImportPlugin(BuildContext context, WidgetRef ref) async {
+    final fileDataSource = ref.read(backupFileDataSourceProvider);
+
+    // Pick the plugin-exported JSON file.
+    final filePath = await fileDataSource.pickFile();
+    if (filePath == null || !context.mounted) return;
+
+    await ref.read(pluginImportProvider.notifier).importFromFile(filePath);
+
+    if (!context.mounted) return;
+    final state = ref.read(pluginImportProvider);
+    if (state is PluginImportCompleted) {
+      // The merge wrote the new accounts/tags straight into Hive behind the
+      // notifiers. Invalidate them so any open list re-reads the fresh data.
+      // This is the codebase's established refresh idiom (see
+      // TagsNotifier.delete); unlike the full restore flow, an append-only
+      // import needs no app restart.
+      ref.invalidate(accountsProvider);
+      ref.invalidate(tagsProvider);
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PluginImportResultPage(summary: state.summary),
+        ),
+      );
+      // Reset state after user returns from the result page.
+      if (context.mounted) {
+        ref.read(pluginImportProvider.notifier).reset();
       }
     }
   }
