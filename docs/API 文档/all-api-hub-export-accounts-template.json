@@ -1,0 +1,175 @@
+{
+  "version": "2.0",
+  "timestamp": 1781008077911,
+  "type": "accounts",
+  "accounts": {
+    "accounts": [
+      {
+        "id": "account_1765503130831_a46ux20eh",
+        "site_name": "Anyrouter",
+        "site_url": "https://anyrouter.top",
+        "health": {
+          "status": "healthy",
+          "reason": "账号状态正常"
+        },
+        "site_type": "anyrouter",
+        "exchange_rate": 7.3,
+        "account_info": {
+          "id": "77742",
+          "access_token": "xxxxxxxxxx",
+          "username": "linuxdo_77742",
+          "quota": 2074349914,
+          "today_prompt_tokens": 0,
+          "today_completion_tokens": 0,
+          "today_quota_consumption": 0,
+          "today_requests_count": 0,
+          "today_income": 0
+        },
+        "last_sync_time": 1780591410608,
+        "updated_at": 1780591410616,
+        "user_updated_at": 1777731014368,
+        "created_at": 1765503130830,
+        "notes": "",
+        "tagIds": ["tag-608136db-1992-4bf3-9ee4-58c7e2612ee4"],
+        "disabled": false,
+        "excludeFromTotalBalance": false,
+        "excludeFromTodayIncome": false,
+        "authType": "cookie",
+        "checkIn": {
+          "enableDetection": true,
+          "autoCheckInEnabled": false,
+          "siteStatus": {
+            "isCheckedInToday": true,
+            "lastCheckInDate": "2026-03-10",
+            "lastDetectedAt": 1780591410608
+          },
+          "customCheckIn": {
+            "url": "",
+            "redeemUrl": "",
+            "openRedeemWithCheckIn": true,
+            "isCheckedInToday": false
+          }
+        },
+        "tags": [],
+        "configVersion": 6,
+        "cookieAuth": {
+          "sessionCookie": "session=xxxxxxx"
+        },
+        "manualBalanceUsd": ""
+      },
+      {
+        "id": "account_1767674654132_vkcf8yheo",
+        "site_name": "Neb 公益站",
+        "site_url": "https://ai.zzhdsgsss.xyz",
+        "health": {
+          "status": "healthy",
+          "reason": "账号状态正常"
+        },
+        "site_type": "new-api",
+        "exchange_rate": 20,
+        "account_info": {
+          "id": "95",
+          "access_token": "xxxxxxx",
+          "username": "linuxdo_95",
+          "quota": 155018407,
+          "today_prompt_tokens": 0,
+          "today_completion_tokens": 0,
+          "today_quota_consumption": 0,
+          "today_requests_count": 0,
+          "today_income": 119924
+        },
+        "last_sync_time": 1780968036694,
+        "updated_at": 1780968036706,
+        "user_updated_at": 1779876019503,
+        "created_at": 1767674654132,
+        "notes": "xxxxx",
+        "tagIds": [],
+        "disabled": false,
+        "excludeFromTotalBalance": false,
+        "excludeFromTodayIncome": false,
+        "authType": "access_token",
+        "checkIn": {
+          "enableDetection": true,
+          "autoCheckInEnabled": true,
+          "siteStatus": {
+            "isCheckedInToday": true,
+            "lastCheckInDate": "2026-06-09",
+            "lastDetectedAt": 1780968036694
+          },
+          "customCheckIn": {
+            "url": "",
+            "redeemUrl": "",
+            "openRedeemWithCheckIn": true,
+            "isCheckedInToday": false
+          }
+        },
+        "tags": [],
+        "configVersion": 6,
+        "manualBalanceUsd": ""
+      }
+    ],
+    "bookmarks": [],
+    "pinnedAccountIds": [
+      "account_1765503130831_a46ux20eh"
+    ],
+    "orderedAccountIds": [
+      "account_1765503130831_a46ux20eh",
+      "account_1767674654132_vkcf8yheo"
+    ],
+    "deletedEntryRecords": {
+      "account-2691d2b6-a4f6-491c-8139-a60cafe94d70": {
+        "kind": "account",
+        "deletedAt": 1780480817337,
+        "entryUpdatedAt": 1778898592849
+      }
+    },
+    "last_updated": 1781007972911
+  },
+  "tagStore": {
+    "version": 1,
+    "tagsById": {
+      "tag-f0e4bfe3-242d-4109-987b-59381d626a19": {
+        "id": "tag-f0e4bfe3-242d-4109-987b-59381d626a19",
+        "name": "关站归档",
+        "createdAt": 1769240178614,
+        "updatedAt": 1769240178614
+      },
+      "tag-ddb6816c-da8a-49fb-b517-b6d54f0df2d3": {
+        "id": "tag-ddb6816c-da8a-49fb-b517-b6d54f0df2d3",
+        "name": "翻译",
+        "createdAt": 1769240178614,
+        "updatedAt": 1769240178614
+      },
+      "tag-3e04c09c-21d2-4757-a97d-c7c9058a8ad9": {
+        "id": "tag-3e04c09c-21d2-4757-a97d-c7c9058a8ad9",
+        "name": "Discord",
+        "createdAt": 1769240178614,
+        "updatedAt": 1769240178614
+      },
+      "tag-6554f9f4-9efb-4907-9b90-c99990f1b69b": {
+        "id": "tag-6554f9f4-9efb-4907-9b90-c99990f1b69b",
+        "name": "Chat",
+        "createdAt": 1769240178614,
+        "updatedAt": 1769240178614
+      },
+      "tag-0e868690-ddb3-484a-869c-ea94753e4709": {
+        "id": "tag-0e868690-ddb3-484a-869c-ea94753e4709",
+        "name": "生图",
+        "createdAt": 1769240178614,
+        "updatedAt": 1769240178614
+      },
+      "tag-608136db-1992-4bf3-9ee4-58c7e2612ee4": {
+        "id": "tag-608136db-1992-4bf3-9ee4-58c7e2612ee4",
+        "name": "Coding",
+        "createdAt": 1770047611000,
+        "updatedAt": 1770047621908
+      },
+      "tag-b5a8f18c-b10a-40a2-8314-230d03b47c56": {
+        "id": "tag-b5a8f18c-b10a-40a2-8314-230d03b47c56",
+        "name": "可酒馆",
+        "createdAt": 1770213851603,
+        "updatedAt": 1770213851603
+      }
+    }
+  }
+}

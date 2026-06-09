@@ -20,6 +20,7 @@ This directory contains guidelines for backend development. Fill in each file wi
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
 | [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
 | [API Quota / Balance Contract](./api-quota-balance-contract.md) | Quota/remain_quota semantics, balance formula (no double-deduction) | Active |
+| [Auth Credential Storage Contract](./auth-credential-storage-contract.md) | How `Account.accessToken` is stored per `authType` and injected as a header (cookie = raw session value, no prefix) | Active |
 
 ---
 
