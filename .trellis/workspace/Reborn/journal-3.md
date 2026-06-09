@@ -741,3 +741,36 @@ Created GitHub Actions workflow for full-platform CI: Android (3 ABIs, signed AP
 ### Next Steps
 
 - None - task complete
+
+
+## Session 85: 修复 check_in 与 request_logger 预存 widget 测试失败
+
+**Date**: 2026-06-10
+**Task**: 修复 check_in 与 request_logger 预存 widget 测试失败
+**Branch**: `main`
+
+### Summary
+
+修复从余额任务分离出的 9 个 pre-existing widget 测试失败，经 trellis-implement/trellis-check 双 sub-agent 溯源确认全部为测试过期（生产实现无 bug）：7 个 wide-layout 失败根因是测试未初始化 Hive——SplitPane→splitPaneRatioProvider→_hydrate→Hive.box('app_data') 抛 Box not found，异常伪装成 RenderProxyBoxMixin.performLayout 渲染堆栈极具误导性，照搬 widget_test.dart 模式补 Hive init/teardown 解决；2 个开关失败因 requestLoggerEnabledProvider 默认 kDebugMode（test 下为 true），显式 pin state=false 修复。删除故意停放的 _buildAuxBar WIP 死代码消除 unused_element warning。沉淀 frontend/testing-guidelines.md（Hive 测试契约+2 个 gotcha）。插曲：_buildAuxBar 删除在 sub-agent 流程中丢失，首次 commit 后核验 files-changed 数异常发现，亲自重删并验证（analyze+test 双绿）后 git amend 补回，使 commit 名副其实。验收：flutter test +573 ~2 全绿、flutter analyze 0 issue。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f2999e6` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
