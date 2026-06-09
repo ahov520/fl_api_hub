@@ -707,3 +707,37 @@ Created GitHub Actions workflow for full-platform CI: Android (3 ABIs, signed AP
 ### Next Steps
 
 - None - task complete
+
+
+## Session 84: 修复账号与Key余额双重扣减
+
+**Date**: 2026-06-10
+**Task**: 修复账号与Key余额双重扣减
+**Branch**: `main`
+
+### Summary
+
+通过 brainstorm 定位并修复账号层 computeBalance 与 Key 层余额计算的双重扣减：quota/remain_quota 本身即剩余额度，旧代码误减 used_quota 致余额偏小。改为直接用 quota，订正误导性字段注释。用 git stash baseline 诊断区分自引入失败与 pre-existing，补修间接依赖 computeBalance 的 accounts_notifier_test（规划初稿遗漏）。新增 backend spec api-quota-balance-contract.md 固化字段契约；为 check_in/request_logger 的 9 个 pre-existing 失败立项跟踪任务。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `eb02cc7` | (see git log) |
+| `f6c5ce8` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
