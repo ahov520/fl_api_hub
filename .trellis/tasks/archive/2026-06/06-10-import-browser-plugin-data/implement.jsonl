@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/backend/api-quota-balance-contract.md", "reason": "余额换算 quota/500000 必须遵守此契约：插件 quota 已是剩余额度，不可再减消耗，避免双重扣减"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "本特性跨 data/domain/presentation 三层且数据格式逐层变换（插件JSON→DTO→Account map→Hive），需按跨层指南检查边界一致性"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "强制复用现有 BackupHiveReader/BackupFileDataSource，禁止重写文件选择与 Hive 写入逻辑"}
+{"file": ".trellis/spec/frontend/testing-guidelines.md", "reason": "新增 mapper/merger 单测与 backup_page widget 测试，需遵循项目 Hive init 与 provider override 约定"}
