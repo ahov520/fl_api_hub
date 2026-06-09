@@ -774,3 +774,37 @@ Created GitHub Actions workflow for full-platform CI: Android (3 ABIs, signed AP
 ### Next Steps
 
 - None - task complete
+
+
+## Session 86: 导入 All-API-Hub 浏览器插件导出数据
+
+**Date**: 2026-06-10
+**Task**: 导入 All-API-Hub 浏览器插件导出数据
+**Branch**: `feat/import-browser-plugin-data`
+
+### Summary
+
+数据管理页新增独立板块，支持导入 All-API-Hub 浏览器插件导出的 v2.0 JSON。新增 plugin DTO 解析、账号映射器(cookie 剥 session= 前缀、quota 按 kDefaultQuotaPerUnit 换算 USD、disabled 取反、ms 转 ISO8601)、去重合并器(账号按 baseUrl+username 跳过、标签按名复用并重映射 tagIds)，复用 BackupHiveReader 合并追加写入。沉淀 auth-credential-storage-contract spec。trellis-check PASS，analyze 0 warning，611 测试全绿。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `2813f7d` | (see git log) |
+| `3052b3a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

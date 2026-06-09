@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-3.md`
-- **Total Sessions**: 85
+- **Total Sessions**: 86
 - **Last Active**: 2026-06-10
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-3.md` | ~776 | Active |
+| `journal-3.md` | ~810 | Active |
 | `journal-2.md` | ~1983 | Archived |
 | `journal-1.md` | ~1977 | Archived |
 <!-- @@@/auto:active-documents -->
@@ -31,6 +31,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 86 | 2026-06-10 | 导入 All-API-Hub 浏览器插件导出数据 | `2813f7d`, `3052b3a` | `feat/import-browser-plugin-data` |
 | 85 | 2026-06-10 | 修复 check_in 与 request_logger 预存 widget 测试失败 | `f2999e6` | `main` |
 | 84 | 2026-06-10 | 修复账号与Key余额双重扣减 | `eb02cc7`, `f6c5ce8` | `main` |
 | 83 | 2026-05-02 | External check-in URL UX + URL validation | `bd08922` | `main` |
