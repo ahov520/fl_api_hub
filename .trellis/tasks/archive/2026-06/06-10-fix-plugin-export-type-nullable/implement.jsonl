@@ -1,0 +1,3 @@
+{"file": ".trellis/spec/frontend/testing-guidelines.md", "reason": "需改写 plugin_export_dto_test.dart 的 validation 用例并新增『完整数据导出（无 type）』解析用例，遵循项目单测约定"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "fromJson 仍是单一校验闸门：移除 type 判断后必须保留 FormatException + 中文提示语义，调用方零写入中止逻辑不可破坏"}
+{"file": "docs/API 文档/export-json-data.md", "reason": "「仅账号数据」导出格式参考（顶层含 type: accounts）；完整数据导出顶层无 type 但账号结构兼容，据此理解两种格式差异"}

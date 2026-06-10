@@ -1,0 +1,3 @@
+{"file": ".trellis/spec/frontend/testing-guidelines.md", "reason": "核验新增/改写的 DTO 单测是否符合项目测试规范，validation 组用例语义需与新行为一致"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "确认结构校验（accounts Map / accounts.accounts List）仍抛 FormatException 且中文提示不变，零写入中止语义未被破坏"}
+{"file": "docs/API 文档/export-json-data.md", "reason": "对照「仅账号数据」格式确认旧格式（含 type）仍可解析成功，向后兼容"}
