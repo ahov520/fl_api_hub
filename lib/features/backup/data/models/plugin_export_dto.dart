@@ -1,5 +1,8 @@
-/// DTOs for the All-API-Hub browser plugin export file (backup `version "2.0"`,
-/// `type "accounts"`).
+/// DTOs for the All-API-Hub browser plugin export file (backup `version "2.0"`).
+///
+/// Two export flavors share this shape: the accounts-only export carries
+/// `type "accounts"`, while the full-data export has no top-level `type` at
+/// all — both nest the same `accounts` structure.
 ///
 /// These are *parse-only* value objects: they mirror the plugin's JSON shape
 /// closely enough to feed [PluginAccountMapper] and the import merger, while
@@ -20,8 +23,10 @@ class PluginExport {
   /// Export time as a Unix millisecond timestamp.
   final int? timestamp;
 
-  /// Backup discriminator — must equal `"accounts"` for an account export.
-  final String type;
+  /// Backup discriminator (`"accounts"` for an accounts-only export). The
+  /// full-data export omits this key entirely, so it carries no validation
+  /// weight — kept only as parsed metadata.
+  final String? type;
 
   /// Site accounts in their stored (unordered) form.
   final List<PluginSiteAccount> accounts;
@@ -44,15 +49,12 @@ class PluginExport {
   /// Parses and validates a decoded plugin export map.
   ///
   /// Throws a [FormatException] with a user-facing Chinese message when the
-  /// payload is not a valid All-API-Hub account export, i.e. when `type` is not
-  /// `"accounts"` or the nested `accounts.accounts` array is missing. This is
-  /// the single validation gate — callers can treat any thrown
-  /// [FormatException] as "not a plugin file" and abort with zero writes.
+  /// payload is not a valid All-API-Hub export, i.e. when the nested
+  /// `accounts.accounts` array is missing. `type` is deliberately not checked:
+  /// the full-data export has no `type` key. This is the single validation
+  /// gate — callers can treat any thrown [FormatException] as "not a plugin
+  /// file" and abort with zero writes.
   factory PluginExport.fromJson(Map<String, dynamic> json) {
-    if (json['type'] != 'accounts') {
-      throw const FormatException('不是有效的 All-API-Hub 导出文件');
-    }
-
     final accountsConfig = json['accounts'];
     if (accountsConfig is! Map) {
       throw const FormatException('不是有效的 All-API-Hub 导出文件');
@@ -92,7 +94,7 @@ class PluginExport {
     return PluginExport(
       version: json['version'] as String?,
       timestamp: (json['timestamp'] as num?)?.toInt(),
-      type: json['type'] as String,
+      type: json['type'] as String?,
       accounts: accounts,
       orderedAccountIds: orderedAccountIds,
       tagStore: tagStore,

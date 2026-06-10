@@ -75,22 +75,32 @@ void main() {
     });
 
     group('validation', () {
-      test('throws when type is not "accounts"', () {
-        expect(
-          () => PluginExport.fromJson({
-            'version': '2.0',
-            'type': 'bookmarks',
-            'accounts': {'accounts': <dynamic>[]},
-          }),
-          throwsA(isA<FormatException>()),
-        );
+      test('parses a full-data export that has no top-level type key', () {
+        final export = PluginExport.fromJson({
+          'version': '2.0',
+          'accounts': {
+            'accounts': [
+              {
+                'id': 'account_1',
+                'site_name': 'demo',
+                'site_url': 'https://demo.example.com',
+              },
+            ],
+          },
+        });
+        expect(export.type, isNull);
+        expect(export.accounts, hasLength(1));
+        expect(export.accounts.first.siteName, 'demo');
       });
 
-      test('throws when the type key is missing entirely', () {
-        expect(
-          () => PluginExport.fromJson({'version': '2.0'}),
-          throwsA(isA<FormatException>()),
-        );
+      test('ignores a non-"accounts" type when the structure is valid', () {
+        final export = PluginExport.fromJson({
+          'version': '2.0',
+          'type': 'bookmarks',
+          'accounts': {'accounts': <dynamic>[]},
+        });
+        expect(export.type, 'bookmarks');
+        expect(export.accounts, isEmpty);
       });
 
       test('throws when the accounts object is missing', () {
