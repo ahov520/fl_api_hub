@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-3.md`
-- **Total Sessions**: 86
+- **Total Sessions**: 87
 - **Last Active**: 2026-06-10
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-3.md` | ~810 | Active |
+| `journal-3.md` | ~845 | Active |
 | `journal-2.md` | ~1983 | Archived |
 | `journal-1.md` | ~1977 | Archived |
 <!-- @@@/auto:active-documents -->
@@ -31,6 +31,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 87 | 2026-06-10 | 修复 PluginExport 完整导出 type 校验误拒 | `d0e287c`, `992342e`, `1771a96` | `feat/import-browser-plugin-data` |
 | 86 | 2026-06-10 | 导入 All-API-Hub 浏览器插件导出数据 | `2813f7d`, `3052b3a` | `feat/import-browser-plugin-data` |
 | 85 | 2026-06-10 | 修复 check_in 与 request_logger 预存 widget 测试失败 | `f2999e6` | `main` |
 | 84 | 2026-06-10 | 修复账号与Key余额双重扣减 | `eb02cc7`, `f6c5ce8` | `main` |

@@ -808,3 +808,38 @@ Created GitHub Actions workflow for full-platform CI: Android (3 ABIs, signed AP
 ### Next Steps
 
 - None - task complete
+
+
+## Session 87: 修复 PluginExport 完整导出 type 校验误拒
+
+**Date**: 2026-06-10
+**Task**: 修复 PluginExport 完整导出 type 校验误拒
+**Branch**: `feat/import-browser-plugin-data`
+
+### Summary
+
+修复 PluginExport.fromJson 误拒无 type 的完整数据导出：type 改为 String? 并移除 type 校验，文件有效性由 accounts.accounts 结构校验兜底；更新 DTO 单测（删 2 个过时用例、增 2 个新行为用例，64 测试全绿）；沉淀 plugin-export-parse-contract.md spec 记录两种导出格式契约；顺带提交了用户手改的备份页导入入口文案与图标调整。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `d0e287c` | (see git log) |
+| `992342e` | (see git log) |
+| `1771a96` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
