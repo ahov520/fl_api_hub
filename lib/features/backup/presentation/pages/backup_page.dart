@@ -103,12 +103,12 @@ class BackupPage extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           SectionCard(
-            icon: Icons.extension_outlined,
-            title: '从浏览器插件导入',
+            icon: Icons.save_alt_outlined,
+            title: '从第三方来源导入',
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.download_for_offline_outlined),
+                  leading: const Icon(Icons.extension_outlined),
                   title: const Text('导入 All-API-Hub 插件数据'),
                   subtitle: const Text('从浏览器插件导出的账号文件合并追加账号与标签'),
                   trailing: pluginState is PluginImportInProgress
