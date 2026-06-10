@@ -31,6 +31,12 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
+# fix: coroutine(37,1): error C2338:
+#      static assertion failed: 'error STL1011: The /await compiler option, <experimental/coroutine>, <experimental/generator>, and <experimental/resumable> are deprecated by Microsoft and will be REMOVED SOON.
+#      They are superseded by the C++20 <coroutine> and C++23 <generator> headers.
+#      You can define _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS to suppress this error for now.'
+#      [flutter_inappwebview_windows\flutter_inappwebview_windows_plugin.vcxproj]
+# add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
 
 # Compilation settings that should be applied to most targets.
 #

@@ -163,6 +163,12 @@ jobs:
         run: |
           flutter build windows --release
           Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath fl-api-hub-windows.zip
+        env:
+          # fix: coroutine(37,1): error C2338: static assertion failed:
+          #      'error STL1011: The /await compiler option, <experimental/coroutine>, <experimental/generator>, and <experimental/resumable> are deprecated by Microsoft and will be REMOVED SOON. They are superseded by the C++20 <coroutine> and C++23 <generator> headers.
+          #      You can define _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS to suppress this error for now.'
+          #      [flutter_inappwebview_windows\flutter_inappwebview_windows_plugin.vcxproj]
+          CL: "/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS"
 
       - name: Upload Windows artifact
         if: matrix.target == 'windows'
