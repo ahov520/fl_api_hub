@@ -6,7 +6,9 @@ on:
       - 'v*'
 
 env:
-  FLUTTER_VERSION: '3.38.9'
+  # Must match the SDK pin of material_color_utilities in pubspec.yaml:
+  # 3.38.x pins 0.11.1, 3.44.x pins 0.13.0 (pubspec requires ^0.13.0).
+  FLUTTER_VERSION: '3.44.6'
 
 jobs:
   build:
