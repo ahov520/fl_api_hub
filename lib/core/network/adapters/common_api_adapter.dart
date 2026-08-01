@@ -17,6 +17,7 @@ import '../../result/result.dart';
 import '../api_request.dart';
 import '../dio_client.dart';
 import '../dto/access_token_dto.dart';
+import '../dto/announcement_dto.dart';
 import '../dto/api_response.dart';
 import '../dto/check_in_result_dto.dart';
 import '../dto/check_in_status_dto.dart';
@@ -459,6 +460,83 @@ class CommonApiAdapter implements SiteAdapter {
       request: request,
       fromJson: AccessTokenDto.fromJson,
     );
+  }
+
+  // ── Announcement operations ─────────────────────────────────────
+
+  @override
+  Future<Result<AnnouncementListDto>> fetchAnnouncements(
+    ApiRequest request,
+  ) async {
+    try {
+      final response = await dioClient
+          .getDio(proxy: request.proxy)
+          .request(
+            '/api/notice',
+            options: Options(method: 'GET', extra: buildExtra(request)),
+          );
+
+      final json = response.data;
+      // new-api returns the notice as a bare string or an envelope
+      // `{success, message, data}` where data is a string or a list.
+      if (json is String) {
+        final trimmed = json.trim();
+        if (trimmed.isEmpty) {
+          return const Success<AnnouncementListDto>(
+            AnnouncementListDto.empty(),
+          );
+        }
+        return Success<AnnouncementListDto>(
+          AnnouncementListDto(
+            announcements: [AnnouncementDto(title: '', content: trimmed)],
+          ),
+        );
+      }
+
+      if (json is Map<String, dynamic>) {
+        final success = json['success'] as bool? ?? true;
+        if (!success) {
+          return const Success<AnnouncementListDto>(
+            AnnouncementListDto.empty(),
+          );
+        }
+        final data = json['data'];
+        if (data is String) {
+          final trimmed = data.trim();
+          if (trimmed.isEmpty) {
+            return const Success<AnnouncementListDto>(
+              AnnouncementListDto.empty(),
+            );
+          }
+          return Success<AnnouncementListDto>(
+            AnnouncementListDto(
+              announcements: [AnnouncementDto(title: '', content: trimmed)],
+            ),
+          );
+        }
+        if (data is List) {
+          final announcements = data
+              .whereType<Map<String, dynamic>>()
+              .map(AnnouncementDto.fromCommonJson)
+              .toList();
+          return Success<AnnouncementListDto>(
+            AnnouncementListDto(announcements: announcements),
+          );
+        }
+      }
+
+      return const Success<AnnouncementListDto>(AnnouncementListDto.empty());
+    } on DioException catch (e, st) {
+      return Failure<AnnouncementListDto>(mapToAppException(e, st));
+    } catch (e, st) {
+      return Failure<AnnouncementListDto>(
+        UnknownException(
+          message: e.toString(),
+          originalError: e,
+          stackTrace: st,
+        ),
+      );
+    }
   }
 
   // ── Internal helpers ────────────────────────────────────────────

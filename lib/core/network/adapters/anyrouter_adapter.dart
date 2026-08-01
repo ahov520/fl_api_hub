@@ -16,6 +16,7 @@ import '../../result/result.dart';
 import '../api_request.dart';
 import '../dio_client.dart';
 import '../dto/access_token_dto.dart';
+import '../dto/announcement_dto.dart';
 import '../dto/check_in_result_dto.dart';
 import '../dto/check_in_status_dto.dart';
 import '../dto/group_dto.dart';
@@ -197,6 +198,15 @@ class AnyRouterAdapter implements SiteAdapter {
     return const Failure(
       NetworkException(message: 'AnyRouter does not support group management'),
     );
+  }
+
+  // ── Announcement operations (unsupported) ───────────────────────
+
+  @override
+  Future<Result<AnnouncementListDto>> fetchAnnouncements(
+    ApiRequest request,
+  ) async {
+    return const Success<AnnouncementListDto>(AnnouncementListDto.empty());
   }
 
   // ── Auth helpers (unsupported) ───────────────────────────────────

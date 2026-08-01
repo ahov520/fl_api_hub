@@ -14,6 +14,7 @@ import '../../../core/result/result.dart';
 import '../../../core/network/api_request.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/network/dto/access_token_dto.dart';
+import '../../../core/network/dto/announcement_dto.dart';
 import '../../../core/network/dto/check_in_result_dto.dart';
 import '../../../core/network/dto/check_in_status_dto.dart';
 import '../../../core/network/dto/group_dto.dart';
@@ -313,6 +314,15 @@ class Sub2ApiAdapter implements SiteAdapter {
   }
 
   // ── Group operations ──────────────────────────────────────────────
+
+  // ── Announcement operations (unsupported) ───────────────────────
+
+  @override
+  Future<Result<AnnouncementListDto>> fetchAnnouncements(
+    ApiRequest request,
+  ) async {
+    return const Success<AnnouncementListDto>(AnnouncementListDto.empty());
+  }
 
   @override
   Future<Result<GroupListDto>> fetchGroups(ApiRequest request) async {

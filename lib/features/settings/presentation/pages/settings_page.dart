@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../announcements/presentation/pages/announcements_page.dart';
+import '../../../announcements/presentation/providers/announcements_providers.dart';
 import '../../../backup/presentation/pages/backup_page.dart';
 import '../../../dev_tools/request_logger/presentation/pages/developer_options_page.dart';
 import '../../domain/entities/global_proxy_setting.dart';
@@ -48,16 +50,23 @@ class SettingsPage extends ConsumerWidget {
           SectionCard(
             icon: Icons.storage_outlined,
             title: '数据管理',
-            child: ListTile(
-              leading: const Icon(Icons.backup_outlined),
-              title: const Text('备份与恢复'),
-              subtitle: const Text('导出、导入或加密备份数据'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const BackupPage()),
-                );
-              },
+            child: Column(
+              children: [
+                const _AnnouncementsTile(),
+                ListTile(
+                  leading: const Icon(Icons.backup_outlined),
+                  title: const Text('备份与恢复'),
+                  subtitle: const Text('导出、导入或加密备份数据'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const BackupPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -97,6 +106,31 @@ class SettingsPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Announcements tile with an unread-count badge.
+class _AnnouncementsTile extends ConsumerWidget {
+  const _AnnouncementsTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadAnnouncementsCountProvider);
+    return ListTile(
+      leading: Badge(
+        isLabelVisible: unread > 0,
+        label: Text('$unread'),
+        child: const Icon(Icons.campaign_outlined),
+      ),
+      title: const Text('站点公告'),
+      subtitle: Text(unread > 0 ? '$unread 条未读' : '聚合各站点最新公告'),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const AnnouncementsPage()),
+        );
+      },
     );
   }
 }

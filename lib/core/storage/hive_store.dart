@@ -55,6 +55,7 @@ class HiveStoreImpl implements KeyValueStore {
 /// - `scheduler_config` — auto-check-in scheduler configuration
 /// - `account_reachability` — cached website reachability per account
 /// - `network_proxy` — global network proxy setting (singleton document)
+/// - `announcements` — cached site announcements and per-account read state
 Future<void> initHive() async {
   if (kIsWeb) {
     await Hive.initFlutter();
@@ -74,6 +75,7 @@ Future<void> initHive() async {
     Hive.openBox('scheduler_config'),
     Hive.openBox('account_reachability'),
     Hive.openBox('network_proxy'),
+    Hive.openBox('announcements'),
   ]);
 }
 

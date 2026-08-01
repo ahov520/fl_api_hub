@@ -12,6 +12,7 @@ library;
 import '../result/result.dart';
 import 'api_request.dart';
 import 'dto/access_token_dto.dart';
+import 'dto/announcement_dto.dart';
 import 'dto/check_in_result_dto.dart';
 import 'dto/check_in_status_dto.dart';
 import 'dto/group_dto.dart';
@@ -119,6 +120,16 @@ abstract class SiteAdapter {
   /// - Sub2API: `GET /api/v1/groups/available`
   /// - Octopus: returns empty list (not supported)
   Future<Result<GroupListDto>> fetchGroups(ApiRequest request);
+
+  // ── Announcement operations ─────────────────────────────────────
+
+  /// Fetches site announcements / notices.
+  ///
+  /// Endpoint: `GET /api/notice` (Common/new-api).
+  ///
+  /// Adapters for backends without an announcements endpoint (Sub2API,
+  /// AnyRouter, etc.) return an empty [AnnouncementListDto].
+  Future<Result<AnnouncementListDto>> fetchAnnouncements(ApiRequest request);
 
   // ── Auth helpers ────────────────────────────────────────────────
 
