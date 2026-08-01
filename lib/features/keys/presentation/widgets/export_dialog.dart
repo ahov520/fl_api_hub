@@ -84,7 +84,7 @@ class _ExportDialogState extends State<_ExportDialog> {
 
       if (!mounted) return;
 
-      if (widget.tool is CCSwitchExportTool) {
+      if (widget.tool.isDeeplink) {
         // Deeplink: handled inside export()
         Navigator.pop(context);
         ScaffoldMessenger.of(

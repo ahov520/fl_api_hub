@@ -5,14 +5,16 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../data/export/export_tool.dart';
+import '../../data/verify/key_verification_service.dart';
 import '../../domain/entities/api_key.dart';
 import 'export_dialog.dart';
 
 /// A bottom bar with platform-filtered export tool chips.
-class KeyExportBar extends StatelessWidget {
+class KeyExportBar extends ConsumerStatefulWidget {
   /// The selected key to export.
   final ApiKey? apiKey;
 
@@ -30,13 +32,47 @@ class KeyExportBar extends StatelessWidget {
   });
 
   @override
+  ConsumerState<KeyExportBar> createState() => _KeyExportBarState();
+}
+
+class _KeyExportBarState extends ConsumerState<KeyExportBar> {
+  bool _isTesting = false;
+
+  bool get _hasApiKey =>
+      widget.apiKey != null &&
+      widget.apiKey!.keyValue != null &&
+      widget.apiKey!.keyValue!.isNotEmpty;
+
+  Future<void> _handleTest() async {
+    if (_isTesting || !_hasApiKey) return;
+    setState(() => _isTesting = true);
+
+    final service = ref.read(keyVerificationServiceProvider);
+    final result = await service.verify(
+      baseUrl: widget.baseUrl,
+      apiKey: widget.apiKey!.keyValue!,
+    );
+
+    if (!mounted) return;
+    setState(() => _isTesting = false);
+
+    final latency = result.latency != null
+        ? ' · ${result.latency!.inMilliseconds}ms'
+        : '';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${result.message}$latency'),
+        backgroundColor: result.success
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).colorScheme.errorContainer,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final tools = platformExportTools;
-    final hasApiKey =
-        apiKey != null &&
-        apiKey!.keyValue != null &&
-        apiKey!.keyValue!.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -53,64 +89,129 @@ class KeyExportBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: tools.isEmpty
-            ? _buildEmptyState(context)
-            : Row(
-                children: [
-                  Text(
-                    '导出:',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: tools
-                            .map(
-                              (tool) => Padding(
-                                padding: const EdgeInsets.only(
-                                  right: AppSpacing.sm,
-                                ),
-                                child: _ExportChip(
-                                  label: tool.name,
-                                  icon: tool.icon,
-                                  enabled: hasApiKey,
-                                  onTap: hasApiKey
-                                      ? () => showExportDialog(
-                                          context: context,
-                                          tool: tool,
-                                          defaultName: providerName,
-                                          apiKey: apiKey!.keyValue!,
-                                          baseUrl: baseUrl,
-                                          homepage: baseUrl,
-                                        )
-                                      : null,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ),
-                ],
+        child: Row(
+          children: [
+            _TestButton(
+              enabled: _hasApiKey,
+              isTesting: _isTesting,
+              onTap: _handleTest,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            if (tools.isEmpty)
+              Expanded(child: _buildEmptyState(context))
+            else ...[
+              Text(
+                '导出:',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: tools
+                        .map(
+                          (tool) => Padding(
+                            padding: const EdgeInsets.only(
+                              right: AppSpacing.sm,
+                            ),
+                            child: _ExportChip(
+                              label: tool.name,
+                              icon: tool.icon,
+                              enabled: _hasApiKey,
+                              onTap: _hasApiKey
+                                  ? () => showExportDialog(
+                                      context: context,
+                                      tool: tool,
+                                      defaultName: widget.providerName,
+                                      apiKey: widget.apiKey!.keyValue!,
+                                      baseUrl: widget.baseUrl,
+                                      homepage: widget.baseUrl,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: Center(
-        child: Text(
-          '当前平台暂无支持的导出工具',
-          style: TextStyle(fontSize: 12, color: colorScheme.outline),
+    return Text(
+      '当前平台暂无导出工具',
+      style: TextStyle(fontSize: 12, color: colorScheme.outline),
+    );
+  }
+}
+
+/// A compact "test connectivity" button shown before the export chips.
+class _TestButton extends StatelessWidget {
+  final bool enabled;
+  final bool isTesting;
+  final VoidCallback? onTap;
+
+  const _TestButton({
+    required this.enabled,
+    required this.isTesting,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: enabled
+          ? colorScheme.tertiaryContainer
+          : colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: enabled && !isTesting ? onTap : null,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isTesting)
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Icon(
+                  Icons.wifi_tethering,
+                  size: 14,
+                  color: enabled
+                      ? colorScheme.onTertiaryContainer
+                      : colorScheme.outline,
+                ),
+              const SizedBox(width: 4),
+              Text(
+                isTesting ? '测试中' : '测试',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: enabled
+                      ? colorScheme.onTertiaryContainer
+                      : colorScheme.outline,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
