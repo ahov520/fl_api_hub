@@ -20,6 +20,7 @@ import '../dto/announcement_dto.dart';
 import '../dto/check_in_result_dto.dart';
 import '../dto/check_in_status_dto.dart';
 import '../dto/group_dto.dart';
+import '../dto/model_pricing_dto.dart';
 import '../dto/site_status_dto.dart';
 import '../dto/token_dto.dart';
 import '../dto/user_info_dto.dart';
@@ -207,6 +208,17 @@ class AnyRouterAdapter implements SiteAdapter {
     ApiRequest request,
   ) async {
     return const Success<AnnouncementListDto>(AnnouncementListDto.empty());
+  }
+
+  // ── Model pricing operations (unsupported) ──────────────────────
+
+  @override
+  Future<Result<ModelPricingResponseDto>> fetchModelPricing(
+    ApiRequest request,
+  ) async {
+    return const Success<ModelPricingResponseDto>(
+      ModelPricingResponseDto.empty(),
+    );
   }
 
   // ── Auth helpers (unsupported) ───────────────────────────────────

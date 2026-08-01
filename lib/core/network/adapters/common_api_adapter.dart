@@ -22,6 +22,7 @@ import '../dto/api_response.dart';
 import '../dto/check_in_result_dto.dart';
 import '../dto/check_in_status_dto.dart';
 import '../dto/group_dto.dart';
+import '../dto/model_pricing_dto.dart';
 import '../dto/site_status_dto.dart';
 import '../dto/token_dto.dart';
 import '../dto/user_info_dto.dart';
@@ -530,6 +531,51 @@ class CommonApiAdapter implements SiteAdapter {
       return Failure<AnnouncementListDto>(mapToAppException(e, st));
     } catch (e, st) {
       return Failure<AnnouncementListDto>(
+        UnknownException(
+          message: e.toString(),
+          originalError: e,
+          stackTrace: st,
+        ),
+      );
+    }
+  }
+
+  // ── Model pricing operations ────────────────────────────────────
+
+  @override
+  Future<Result<ModelPricingResponseDto>> fetchModelPricing(
+    ApiRequest request,
+  ) async {
+    try {
+      final response = await dioClient
+          .getDio(proxy: request.proxy)
+          .request(
+            '/api/pricing',
+            options: Options(method: 'GET', extra: buildExtra(request)),
+          );
+
+      final json = response.data;
+      if (json is Map<String, dynamic>) {
+        final success = json['success'] as bool? ?? false;
+        if (!success) {
+          return Failure<ModelPricingResponseDto>(
+            NetworkException(
+              message: json['message']?.toString() ?? 'Fetch pricing failed',
+            ),
+          );
+        }
+        return Success<ModelPricingResponseDto>(
+          ModelPricingResponseDto.fromEnvelope(json),
+        );
+      }
+
+      return const Success<ModelPricingResponseDto>(
+        ModelPricingResponseDto.empty(),
+      );
+    } on DioException catch (e, st) {
+      return Failure<ModelPricingResponseDto>(mapToAppException(e, st));
+    } catch (e, st) {
+      return Failure<ModelPricingResponseDto>(
         UnknownException(
           message: e.toString(),
           originalError: e,

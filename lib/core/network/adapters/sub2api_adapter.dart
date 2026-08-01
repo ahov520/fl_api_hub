@@ -18,6 +18,7 @@ import '../../../core/network/dto/announcement_dto.dart';
 import '../../../core/network/dto/check_in_result_dto.dart';
 import '../../../core/network/dto/check_in_status_dto.dart';
 import '../../../core/network/dto/group_dto.dart';
+import '../../../core/network/dto/model_pricing_dto.dart';
 import '../../../core/network/dto/site_status_dto.dart';
 import '../../../core/network/dto/token_dto.dart';
 import '../../../core/network/dto/user_info_dto.dart';
@@ -322,6 +323,17 @@ class Sub2ApiAdapter implements SiteAdapter {
     ApiRequest request,
   ) async {
     return const Success<AnnouncementListDto>(AnnouncementListDto.empty());
+  }
+
+  // ── Model pricing operations (unsupported) ──────────────────────
+
+  @override
+  Future<Result<ModelPricingResponseDto>> fetchModelPricing(
+    ApiRequest request,
+  ) async {
+    return const Success<ModelPricingResponseDto>(
+      ModelPricingResponseDto.empty(),
+    );
   }
 
   @override

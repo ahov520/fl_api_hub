@@ -16,6 +16,7 @@ import 'dto/announcement_dto.dart';
 import 'dto/check_in_result_dto.dart';
 import 'dto/check_in_status_dto.dart';
 import 'dto/group_dto.dart';
+import 'dto/model_pricing_dto.dart';
 import 'dto/site_status_dto.dart';
 import 'dto/token_dto.dart';
 import 'dto/user_info_dto.dart';
@@ -130,6 +131,16 @@ abstract class SiteAdapter {
   /// Adapters for backends without an announcements endpoint (Sub2API,
   /// AnyRouter, etc.) return an empty [AnnouncementListDto].
   Future<Result<AnnouncementListDto>> fetchAnnouncements(ApiRequest request);
+
+  // ── Model pricing operations ────────────────────────────────────
+
+  /// Fetches the model catalog with pricing and group ratios.
+  ///
+  /// Endpoint: `GET /api/pricing` (Common/new-api).
+  ///
+  /// Adapters for backends without a pricing endpoint return an empty
+  /// [ModelPricingResponseDto].
+  Future<Result<ModelPricingResponseDto>> fetchModelPricing(ApiRequest request);
 
   // ── Auth helpers ────────────────────────────────────────────────
 

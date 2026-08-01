@@ -14,6 +14,7 @@ import '../../../announcements/presentation/pages/announcements_page.dart';
 import '../../../announcements/presentation/providers/announcements_providers.dart';
 import '../../../backup/presentation/pages/backup_page.dart';
 import '../../../dev_tools/request_logger/presentation/pages/developer_options_page.dart';
+import '../../../models/presentation/pages/models_page.dart';
 import '../../domain/entities/global_proxy_setting.dart';
 import '../providers/global_proxy_providers.dart';
 import '../widgets/appearance_settings.dart';
@@ -53,6 +54,19 @@ class SettingsPage extends ConsumerWidget {
             child: Column(
               children: [
                 const _AnnouncementsTile(),
+                ListTile(
+                  leading: const Icon(Icons.price_change_outlined),
+                  title: const Text('模型比价'),
+                  subtitle: const Text('跨站对比同一模型的价格'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const ModelsPage(),
+                      ),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.backup_outlined),
                   title: const Text('备份与恢复'),
