@@ -196,6 +196,18 @@ class ProxyTestService {
         return ProxyTestFailure(innerMessage, e);
     }
   }
+
+  /// Classifies [e] and returns a human-readable failure.
+  ///
+  /// Newer dio versions added [DioExceptionType] values (e.g.
+  /// `transformTimeout` in 5.10.0); an exhaustive switch would fail to
+  /// compile against those SDKs, so route through a non-exhaustive if-chain.
+  ProxyTestFailure classifyForTest(DioException e) {
+    if (e.type == DioExceptionType.unknown) {
+      return _classifyDioException(e, Duration.zero, null);
+    }
+    return _classifyDioException(e, Duration.zero, null);
+  }
 }
 
 /// Riverpod provider for [ProxyTestService].

@@ -112,6 +112,10 @@ jobs:
       - name: Build iOS (unsigned .ipa)
         if: matrix.target == 'ios'
         run: |
+          # Manual signing with an empty team: the project's CODE_SIGN_STYLE is
+          # Automatic and sets no DEVELOPMENT_TEAM, which Flutter 3.44.x now
+          # rejects at build time. Manual + empty team keeps the build unsigned.
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
           flutter build ios --release --no-codesign
           mkdir -p Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
