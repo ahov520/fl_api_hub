@@ -17,7 +17,7 @@ DynamicScheme buildSchemeFromCorePalette({
   double contrastLevel = kDefaultContrastLevel,
 }) {
   return DynamicScheme(
-    sourceColorArgb: palette.primary.get(40),
+    sourceColorHct: Hct.fromInt(palette.primary.get(40)),
     variant: Variant.tonalSpot,
     contrastLevel: contrastLevel,
     isDark: isDark,
