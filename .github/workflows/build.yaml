@@ -78,8 +78,16 @@ jobs:
         if: matrix.target == 'android'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+          # Fail fast on a malformed/corrupted secret instead of surfacing as a
+          # cryptic keytool error ("Tag number over 30") at the end of the build.
+          file android/app/keystore.jks
+          if ! keytool -list -keystore android/app/keystore.jks -storepass "$ANDROID_STORE_PASSWORD" > /dev/null 2>&1; then
+            echo "::error::keystore.jks decoded from ANDROID_KEYSTORE_BASE64 is not a valid JKS (bad/corrupted secret?). Re-export with: base64 -w0 keystore.jks"
+            exit 1
+          fi
 
       - name: Create Android key.properties
         if: matrix.target == 'android'
