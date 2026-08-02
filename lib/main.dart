@@ -5,6 +5,7 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import 'app/app.dart';
 import 'app/router.dart';
+import 'core/notifications/notification_service.dart';
 import 'core/platform/app_method_channel.dart';
 import 'core/storage/hive_store.dart';
 import 'features/check_in/data/datasources/check_in_local_datasource.dart';
@@ -16,6 +17,7 @@ void main() async {
 
   await initHive();
   await _migrateCheckInResultCap();
+  await NotificationService.init();
 
   final container = ProviderContainer();
   AppMethodChannel.init();

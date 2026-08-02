@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'theme/app_theme.dart';
 import 'shell/app_shell.dart';
+import '../../features/accounts/application/balance_alert_service.dart';
 import '../features/settings/presentation/providers/theme_providers.dart';
 
 /// Root widget for the Fl API Hub application.
@@ -24,6 +25,9 @@ class App extends ConsumerWidget {
     final darkTheme = dynamicDark != null
         ? AppTheme.buildFromScheme(dynamicDark)
         : AppTheme.dark;
+
+    // Keep the balance alert listener alive for the app lifetime.
+    ref.watch(balanceAlertServiceProvider);
 
     return MaterialApp(
       title: 'Fl API Hub',

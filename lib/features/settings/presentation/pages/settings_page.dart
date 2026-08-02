@@ -17,6 +17,7 @@ import '../../../dev_tools/request_logger/presentation/pages/developer_options_p
 import '../../../models/presentation/pages/models_page.dart';
 import '../../domain/entities/global_proxy_setting.dart';
 import '../providers/global_proxy_providers.dart';
+import '../providers/notification_settings_providers.dart';
 import '../widgets/appearance_settings.dart';
 import '../widgets/browser_settings.dart';
 import 'about_page.dart';
@@ -46,6 +47,12 @@ class SettingsPage extends ConsumerWidget {
             child: Column(
               children: [const BrowserSettings(), const _NetworkProxyTile()],
             ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SectionCard(
+            icon: Icons.notifications_outlined,
+            title: '余额提醒',
+            child: const _NotificationSettingsSection(),
           ),
           const SizedBox(height: AppSpacing.sm),
           SectionCard(
@@ -177,5 +184,61 @@ class _NetworkProxyTile extends ConsumerWidget {
     if (config == null) return '未配置';
 
     return '已启用 · ${config.scheme.name}://${config.host}:${config.port}';
+  }
+}
+
+/// Notification settings section for balance threshold alerts.
+class _NotificationSettingsSection extends ConsumerWidget {
+  const _NotificationSettingsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(notificationSettingsProvider);
+    final notifier = ref.read(notificationSettingsProvider.notifier);
+
+    return Column(
+      children: [
+        SwitchListTile(
+          secondary: const Icon(Icons.account_balance_wallet_outlined),
+          title: const Text('启用余额不足提醒'),
+          subtitle: const Text('应用在前台时定期检查余额'),
+          value: settings.enabled,
+          onChanged: notifier.setEnabled,
+        ),
+        if (settings.enabled) ...[
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '提醒阈值: \$${settings.thresholdUsd.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Slider(
+                  value: settings.thresholdUsd,
+                  min: 0.5,
+                  max: 10.0,
+                  divisions: 19,
+                  label: '\$${settings.thresholdUsd.toStringAsFixed(1)}',
+                  onChanged: notifier.setThresholdUsd,
+                ),
+              ],
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.notification_important_outlined),
+            title: const Text('仅提醒一次'),
+            subtitle: const Text('余额恢复前不重复提醒同一账号'),
+            value: settings.onlyOncePerAccount,
+            onChanged: notifier.setOnlyOncePerAccount,
+          ),
+        ],
+      ],
+    );
   }
 }
