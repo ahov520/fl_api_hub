@@ -52,6 +52,7 @@ class HiveStoreImpl implements KeyValueStore {
 /// - `check_in_tasks` — check-in task entity storage
 /// - `check_in_results` — check-in result entity storage
 /// - `check_in_request_logs` — persistent request logs for check-in executions
+/// - `balance_snapshots` — balance snapshot history for trend charts
 /// - `scheduler_config` — auto-check-in scheduler configuration
 /// - `account_reachability` — cached website reachability per account
 /// - `network_proxy` — global network proxy setting (singleton document)
@@ -72,6 +73,7 @@ Future<void> initHive() async {
     Hive.openBox('check_in_tasks'),
     Hive.openBox('check_in_results'),
     Hive.openBox('check_in_request_logs'),
+    Hive.openBox('balance_snapshots'),
     Hive.openBox('scheduler_config'),
     Hive.openBox('account_reachability'),
     Hive.openBox('network_proxy'),

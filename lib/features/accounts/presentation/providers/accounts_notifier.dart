@@ -25,8 +25,10 @@ import '../../../../core/result/result.dart';
 import '../../../check_in/data/datasources/check_in_remote_datasource.dart';
 import '../../../settings/data/providers/global_proxy_providers.dart';
 import '../../data/datasources/accounts_remote_datasource.dart';
+import '../../data/datasources/balance_snapshot_local_datasource.dart';
 import '../../data/models/account_api_mapper.dart';
 import '../../domain/entities/account.dart';
+import '../../domain/entities/balance_snapshot.dart';
 import 'account_reachability_providers.dart';
 import 'accounts_providers.dart';
 
@@ -411,6 +413,22 @@ class AccountsNotifier extends AsyncNotifier<List<Account>> {
     final repo = ref.read(accountsRepositoryProvider);
     final result = await repo.update(patched);
     if (result is Failure) return;
+
+    // Persist a balance snapshot for trend charts and threshold alerts.
+    // We only store when the balance actually changed to avoid flooding
+    // the box with duplicate entries on every refresh.
+    if (derivedBalance != null && derivedBalance != account.balance) {
+      final snapshotDs = ref.read(balanceSnapshotLocalDataSourceProvider);
+      await snapshotDs.saveSnapshot(
+        BalanceSnapshot(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          accountId: account.id,
+          balanceUsd: derivedBalance,
+          usedQuota: info.usedQuota,
+          capturedAt: DateTime.now(),
+        ),
+      );
+    }
 
     final current = state.valueOrNull;
     if (current == null) return;
