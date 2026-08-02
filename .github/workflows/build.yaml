@@ -25,23 +25,6 @@ jobs:
             target: android
             abi: arm
             artifact: apk
-          # iOS build (unsigned .ipa)
-          - os: macos-latest
-            target: ios
-            artifact: ios-unsigned
-          # macOS builds (separate architectures)
-          - os: macos-latest
-            target: macos
-            arch: arm64
-            artifact: macos-arm64
-          - os: macos-15-intel
-            target: macos
-            arch: x86_64
-            artifact: macos-x86_64
-          # Windows build
-          - os: windows-latest
-            target: windows
-            artifact: windows
 
     steps:
       - name: Checkout repository
@@ -66,12 +49,6 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
-
-      # iOS/macOS CocoaPods setup
-      - name: Install CocoaPods
-        if: matrix.target == 'ios' || matrix.target == 'macos'
-        run: pod install
-        working-directory: ${{ matrix.target == 'ios' && 'ios' || 'macos' }}
 
       # Android specific steps
       - name: Decode Android keystore
@@ -128,81 +105,6 @@ jobs:
           name: android-${{ matrix.abi }}
           path: build/app/outputs/flutter-apk/fl-api-hub-${{ matrix.abi }}.apk
 
-      # iOS specific steps (unsigned .ipa)
-      - name: Build iOS (unsigned .ipa)
-        if: matrix.target == 'ios'
-        run: |
-          # Manual signing with an empty team: the project's CODE_SIGN_STYLE is
-          # Automatic and sets no DEVELOPMENT_TEAM, which Flutter 3.44.x now
-          # rejects at build time. Manual + empty team keeps the build unsigned.
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
-          flutter build ios --release --no-codesign
-          mkdir -p Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r fl-api-hub.ipa Payload/
-
-      - name: Upload iOS artifact
-        if: matrix.target == 'ios'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-unsigned
-          path: fl-api-hub.ipa
-
-      # macOS specific steps
-      - name: Install macOS dependencies
-        if: matrix.target == 'macos'
-        run: npm install -g appdmg
-
-      - name: Build macOS
-        if: matrix.target == 'macos'
-        run: flutter build macos --release
-
-      - name: Package macOS DMG
-        if: matrix.target == 'macos'
-        run: |
-          cat > dmg-config.json << 'DMGEOF'
-          {
-            "title": "Fl API Hub",
-            "contents": [
-              { "x": 448, "y": 344, "type": "link", "path": "/Applications" },
-              { "x": 192, "y": 344, "type": "file", "path": "build/macos/Build/Products/Release/Fl API Hub.app" }
-            ],
-            "window": {
-              "size": { "width": 660, "height": 500 }
-            }
-          }
-          DMGEOF
-          mkdir -p dist
-          appdmg dmg-config.json "dist/fl-api-hub-macos-${{ matrix.arch }}.dmg"
-
-      - name: Upload macOS artifact
-        if: matrix.target == 'macos'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-${{ matrix.arch }}
-          path: dist/fl-api-hub-macos-${{ matrix.arch }}.dmg
-
-      # Windows specific steps
-      - name: Build Windows
-        if: matrix.target == 'windows'
-        shell: pwsh
-        run: |
-          flutter build windows --release
-          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath fl-api-hub-windows.zip
-        env:
-          # fix: coroutine(37,1): error C2338: static assertion failed:
-          #      'error STL1011: The /await compiler option, <experimental/coroutine>, <experimental/generator>, and <experimental/resumable> are deprecated by Microsoft and will be REMOVED SOON. They are superseded by the C++20 <coroutine> and C++23 <generator> headers.
-          #      You can define _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS to suppress this error for now.'
-          #      [flutter_inappwebview_windows\flutter_inappwebview_windows_plugin.vcxproj]
-          CL: "/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS"
-
-      - name: Upload Windows artifact
-        if: matrix.target == 'windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: fl-api-hub-windows.zip
-
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -227,11 +129,6 @@ jobs:
           files: |
             artifacts/android-arm64/*.apk
             artifacts/android-arm/*.apk
-            artifacts/android-x86_64/*.apk
-            artifacts/ios-unsigned/*.ipa
-            artifacts/macos-arm64/*.dmg
-            artifacts/macos-x86_64/*.dmg
-            artifacts/windows/*.zip
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
