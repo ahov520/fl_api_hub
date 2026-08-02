@@ -17,3 +17,4 @@ abstract final class AppRoutes {
 
 /// Currently selected bottom-navigation tab index.
 final tabIndexProvider = StateProvider<int>((ref) => 0);
+

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/haptics/app_haptics.dart';
 import '../../features/accounts/presentation/pages/accounts_page.dart';
 import '../../features/check_in/presentation/pages/check_in_page.dart';
 import '../../features/keys/presentation/pages/keys_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../router.dart';
+import '../theme/design_tokens.dart';
 
 /// Time window for the double-back-to-exit gesture on the home tab.
 const _exitTimeout = Duration(seconds: 2);
@@ -89,7 +91,26 @@ class _AppShellState extends ConsumerState<AppShell> {
       },
       child: Scaffold(
         appBar: _buildAppBar(context, colorScheme),
-        body: IndexedStack(index: currentIndex, children: _pages),
+        body: AnimatedSwitcher(
+          duration: AppDuration.normal,
+          switchInCurve: AppMotion.emphasizedDecelerate,
+          switchOutCurve: AppMotion.emphasizedAccelerate,
+          transitionBuilder: (child, animation) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0.0, 0.05),
+              end: Offset.zero,
+            ).animate(animation);
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(position: offsetAnimation, child: child),
+            );
+          },
+          child: IndexedStack(
+            key: ValueKey<int>(currentIndex),
+            index: currentIndex,
+            children: _pages,
+          ),
+        ),
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
             indicatorColor: colorScheme.primary,
@@ -112,6 +133,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           child: NavigationBar(
             selectedIndex: currentIndex,
             onDestinationSelected: (index) {
+              AppHaptics.selection();
               ref.read(tabIndexProvider.notifier).state = index;
             },
             destinations: const [

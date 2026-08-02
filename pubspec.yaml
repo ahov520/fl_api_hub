@@ -55,6 +55,7 @@ dependencies:
   url_launcher: ^6.3.2
   re_highlight: ^0.0.3
   package_info_plus: ^9.0.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
