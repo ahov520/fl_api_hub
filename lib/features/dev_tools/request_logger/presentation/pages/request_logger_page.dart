@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../app/theme/design_tokens.dart';
 import '../../../../../core/storage/split_pane_provider.dart';
 import '../../../../../core/widgets/app_empty_state.dart';
+import '../../../../../core/widgets/confirm_dialog.dart';
 import '../../../../../core/widgets/split_pane.dart';
 import '../../domain/entities/request_log_entry.dart';
 import '../../domain/entities/request_log_filter.dart';
@@ -210,22 +211,12 @@ class RequestLoggerPage extends ConsumerWidget {
   }
 
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('清空请求记录？'),
-        content: const Text('此操作不可撤销。清空后开关保持原状。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('清空'),
-          ),
-        ],
-      ),
+      title: '清空请求记录?',
+      content: '此操作不可撤销。清空后开关保持原状。',
+      confirmText: '清空',
+      isDestructive: true,
     );
     if (confirmed != true) return;
     ref.read(requestLogBufferProvider.notifier).clear();

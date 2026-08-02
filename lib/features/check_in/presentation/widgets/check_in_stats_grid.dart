@@ -39,8 +39,8 @@ class CheckInStatsGrid extends StatelessWidget {
               child: _StatCell(
                 label: '成功',
                 value: '${stats.successCount}',
-                borderColor: const Color(0xFF059669),
-                labelColor: const Color(0xFF059669),
+                borderColor: StatusColors.success,
+                labelColor: StatusColors.success,
               ),
             ),
             const SizedBox(width: AppSpacing.xs),

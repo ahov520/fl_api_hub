@@ -139,7 +139,7 @@ class CheckInResultCard extends StatelessWidget {
   Color _messageColor(BuildContext context, CheckInResult result) {
     final colorScheme = Theme.of(context).colorScheme;
     return switch (result.status) {
-      CheckInStatus.success => const Color(0xFF765B00), // tertiary tone
+      CheckInStatus.success => StatusColors.success,
       CheckInStatus.failed => colorScheme.error,
       CheckInStatus.skipped => colorScheme.onSurfaceVariant,
       CheckInStatus.alreadyChecked => colorScheme.onSurfaceVariant,

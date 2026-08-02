@@ -9,8 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/app_error_state.dart';
-import '../../../../core/widgets/app_loading_state.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../accounts/domain/entities/account.dart';
 import '../../../accounts/presentation/providers/accounts_providers.dart';
 import '../../domain/entities/api_key.dart';
@@ -121,7 +122,7 @@ class _KeysPageState extends ConsumerState<KeysPage>
                     ? _buildNoAccountsState(context)
                     : keys.when(
                         data: (list) => _buildList(context, ref, list),
-                        loading: () => const AppLoadingState(message: '加载中...'),
+                        loading: () => AppSkeleton.list(),
                         error: (err, _) => AppErrorState(
                           message: err.toString(),
                           onRetry: () =>
@@ -488,22 +489,12 @@ class _KeysPageState extends ConsumerState<KeysPage>
     WidgetRef ref,
     ApiKey apiKey,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除密钥'),
-        content: Text('确定要删除「${apiKey.name}」吗？此操作无法撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      title: '删除密钥',
+      content: '确定要删除「${apiKey.name}」吗?此操作无法撤销。',
+      confirmText: '删除',
+      isDestructive: true,
     );
     if (confirmed == true && _selectedAccountId != null && mounted) {
       ref.read(keysProvider(_selectedAccountId!).notifier).delete(apiKey.id);

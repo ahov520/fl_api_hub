@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/network/site_type.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../domain/entities/account.dart';
 import '../providers/accounts_providers.dart';
 import '../widgets/account_edit_form.dart';
@@ -58,24 +59,13 @@ class _AccountEditPageState extends ConsumerState<AccountEditPage> {
   }
 
   Future<bool> _confirmDiscardChanges() async {
-    final result = await showDialog<bool>(
+    return showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('放弃未保存的更改？'),
-        content: const Text('你有尚未保存的修改，离开将会丢失。确定继续？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('放弃'),
-          ),
-        ],
-      ),
+      title: '放弃未保存的更改?',
+      content: '你有尚未保存的修改,离开将会丢失。确定继续?',
+      confirmText: '放弃',
+      isDestructive: true,
     );
-    return result ?? false;
   }
 
   Future<void> _onSave() async {
@@ -106,22 +96,12 @@ class _AccountEditPageState extends ConsumerState<AccountEditPage> {
     final account = widget.account;
     if (account == null) return;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('删除账号'),
-        content: Text('确定要删除「${account.name}」吗？此操作无法撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      title: '删除账号',
+      content: '确定要删除「${account.name}」吗?此操作无法撤销。',
+      confirmText: '删除',
+      isDestructive: true,
     );
     if (confirmed != true || !mounted) return;
 

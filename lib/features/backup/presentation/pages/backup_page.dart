@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../accounts/presentation/providers/accounts_providers.dart';
 import '../../../tags/presentation/providers/tags_providers.dart';
@@ -32,7 +33,7 @@ class BackupPage extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.exception.message),
-            behavior: SnackBarBehavior.floating,
+            
           ),
         );
         ref.read(backupProvider.notifier).reset();
@@ -44,7 +45,7 @@ class BackupPage extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.exception.message),
-            behavior: SnackBarBehavior.floating,
+            
           ),
         );
         ref.read(pluginImportProvider.notifier).reset();
@@ -284,22 +285,12 @@ class BackupPage extends ConsumerWidget {
         ref.invalidate(isBackupEncryptedProvider);
       }
     } else {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showConfirmDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('关闭备份加密'),
-          content: const Text('关闭加密后，新创建的备份文件将不包含密码保护。确定要关闭吗？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('取消'),
-            ),
-            FilledButton.tonal(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('确认'),
-            ),
-          ],
-        ),
+        title: '关闭备份加密',
+        content: '关闭加密后,新创建的备份文件将不包含密码保护。确定要关闭吗?',
+        confirmText: '确认',
+        isDestructive: true,
       );
       if (confirmed != true) return;
       await passwordStore.clearPassword();

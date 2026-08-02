@@ -85,6 +85,18 @@ abstract final class StatusColors {
 
   /// Slate — neutral / unknown / disabled status.
   static const neutral = Color(0xFF64748B);
+
+  /// Light container for success badges (paired with [success]).
+  static const successContainer = Color(0xFFD1FAE5);
+
+  /// Dark text/icon on [successContainer].
+  static const onSuccessContainer = Color(0xFF047857);
+
+  /// Light container for warning badges (paired with [warning]).
+  static const warningContainer = Color(0xFFFEF3C7);
+
+  /// Dark text/icon on [warningContainer].
+  static const onWarningContainer = Color(0xFF92400E);
 }
 
 /// Responsive layout breakpoint.

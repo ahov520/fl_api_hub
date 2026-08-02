@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/design_tokens.dart';
 import '../../domain/entities/check_in_result.dart';
 import '../providers/check_in_providers.dart';
 
@@ -19,8 +20,8 @@ class CheckInStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (backgroundColor, textColor, label) = switch (status) {
       CheckInStatus.success => (
-        const Color(0xFFD1FAE5),
-        const Color(0xFF047857),
+        StatusColors.successContainer,
+        StatusColors.onSuccessContainer,
         '成功',
       ),
       CheckInStatus.failed => (
@@ -29,13 +30,13 @@ class CheckInStatusBadge extends StatelessWidget {
         '失败',
       ),
       CheckInStatus.skipped => (
-        const Color(0xFFFEF3C7),
-        const Color(0xFF92400E),
+        StatusColors.warningContainer,
+        StatusColors.onWarningContainer,
         '已跳过',
       ),
       CheckInStatus.alreadyChecked => (
-        const Color(0xFFD1FAE5),
-        const Color(0xFF047857),
+        StatusColors.successContainer,
+        StatusColors.onSuccessContainer,
         '已签到',
       ),
     };
@@ -68,13 +69,13 @@ class CheckInOverallStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (backgroundColor, textColor, label) = switch (status) {
       CheckInOverallStatus.allSuccess => (
-        const Color(0xFFFFDF93),
-        const Color(0xFF503D00),
+        StatusColors.warningContainer,
+        StatusColors.onWarningContainer,
         '全部成功',
       ),
       CheckInOverallStatus.partial => (
-        const Color(0xFFFFDF93),
-        const Color(0xFF503D00),
+        StatusColors.warningContainer,
+        StatusColors.onWarningContainer,
         '部分成功',
       ),
       CheckInOverallStatus.allFailed => (

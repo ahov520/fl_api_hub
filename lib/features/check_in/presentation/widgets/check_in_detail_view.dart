@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/browser/browser_service.dart';
 import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_loading_state.dart';
 import '../../../accounts/presentation/providers/accounts_providers.dart';
@@ -86,22 +87,12 @@ class _CheckInDetailViewState extends ConsumerState<CheckInDetailView> {
   }
 
   Future<void> _confirmClear(String accountName) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('清空签到记录'),
-        content: Text('确定清空 $accountName 的全部签到记录吗？此操作不可恢复。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('清空'),
-          ),
-        ],
-      ),
+      title: '清空签到记录',
+      content: '确定清空 $accountName 的全部签到记录吗?此操作不可恢复。',
+      confirmText: '清空',
+      isDestructive: true,
     );
     if (confirmed != true) return;
 
@@ -275,36 +266,12 @@ class _CheckInDetailViewState extends ConsumerState<CheckInDetailView> {
 
     final useInApp = ref.read(useInAppBrowserProvider);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) {
-        final colorScheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          title: const Text('手动签到'),
-          content: Text.rich(
-            TextSpan(
-              text: useInApp ? '即将打开内置浏览器访问：\n' : '即将使用系统浏览器打开：\n',
-              children: [
-                TextSpan(
-                  text: url,
-                  style: TextStyle(color: colorScheme.primary),
-                ),
-                const TextSpan(text: '\n\n请在页面中手动完成签到。'),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('取消'),
-            ),
-            FilledButton.tonal(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('打开'),
-            ),
-          ],
-        );
-      },
+      title: '手动签到',
+      content:
+          '${useInApp ? '即将打开内置浏览器访问:' : '即将使用系统浏览器打开:'}\n\n$url\n\n请在页面中手动完成签到。',
+      confirmText: '打开',
     );
     if (confirmed != true || !mounted) return;
 

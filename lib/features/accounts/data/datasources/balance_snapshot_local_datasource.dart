@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
-import '../../../../core/storage/hive_store.dart';
 import '../../domain/entities/balance_snapshot.dart';
 import '../models/balance_snapshot_mapper.dart';
 

@@ -18,11 +18,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/browser/browser_service.dart';
+import '../../../../core/haptics/app_haptics.dart';
 import '../../../../core/result/result.dart';
 import '../../../../core/storage/split_pane_provider.dart';
 import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_loading_state.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../core/widgets/split_pane.dart';
 import '../../../check_in/domain/entities/check_in_result.dart';
 import '../../../check_in/presentation/providers/check_in_providers.dart'
@@ -155,24 +158,13 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
   }
 
   Future<bool> _confirmDiscardDetailEdits() async {
-    final result = await showDialog<bool>(
+    return showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('放弃未保存的更改？'),
-        content: const Text('你有尚未保存的修改，切换账号将会丢失。确定继续？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('放弃'),
-          ),
-        ],
-      ),
+      title: '放弃未保存的更改?',
+      content: '你有尚未保存的修改,切换账号将会丢失。确定继续?',
+      confirmText: '放弃',
+      isDestructive: true,
     );
-    return result ?? false;
   }
 
   /// Handles ArrowUp / ArrowDown key events to navigate the account list.
@@ -258,10 +250,13 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
                       : _buildNarrowLayout(context, accounts),
                 ),
                 if (accounts.isLoading)
-                  const Positioned.fill(
+                  Positioned.fill(
                     child: ColoredBox(
-                      color: Color(0x66FFFFFF),
-                      child: AppLoadingState(),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .scrim
+                          .withValues(alpha: 0.32),
+                      child: const AppLoadingState(),
                     ),
                   ),
               ],
@@ -289,7 +284,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         Expanded(
           child: accounts.when(
             data: (list) => _buildBody(context, list),
-            loading: () => const AppLoadingState(message: '加载中...'),
+            loading: () => AppSkeleton.list(),
             error: (err, _) => AppErrorState(
               message: err.toString(),
               onRetry: () => ref.invalidate(accountsProvider),
@@ -325,7 +320,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
               Expanded(
                 child: accounts.when(
                   data: (list) => _buildBody(context, list, isWide: true),
-                  loading: () => const AppLoadingState(message: '加载中...'),
+                  loading: () => AppSkeleton.list(),
                   error: (err, _) => AppErrorState(
                     message: err.toString(),
                     onRetry: () => ref.invalidate(accountsProvider),
@@ -357,7 +352,12 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           height: 48,
           child: FloatingActionButton(
             heroTag: 'accounts_refresh',
-            onPressed: _isRefreshing ? null : _handleRefresh,
+            onPressed: _isRefreshing
+                ? null
+                : () {
+                    AppHaptics.selection();
+                    _handleRefresh();
+                  },
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
             shape: RoundedRectangleBorder(
@@ -386,7 +386,12 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           height: 48,
           child: FloatingActionButton(
             heroTag: 'accounts_refresh_wide',
-            onPressed: _isRefreshing ? null : _handleRefresh,
+            onPressed: _isRefreshing
+                ? null
+                : () {
+                    AppHaptics.selection();
+                    _handleRefresh();
+                  },
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
             shape: RoundedRectangleBorder(
@@ -408,7 +413,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
     final colorScheme = Theme.of(context).colorScheme;
     return FloatingActionButton(
       heroTag: 'add',
-      onPressed: () => AccountEditPage.push(context),
+      onPressed: () {
+        AppHaptics.selection();
+        AccountEditPage.push(context);
+      },
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -653,6 +661,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
               ? DismissDirection.horizontal
               : DismissDirection.endToStart,
           confirmDismiss: (direction) async {
+            AppHaptics.light();
             if (direction == DismissDirection.startToEnd) {
               return _confirmCheckIn(context, account);
             }
@@ -711,8 +720,10 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
                         AccountEditPage.push(context, account: account);
                       }
                     },
-                    onLongPress: (position) =>
-                        _showAccountContextMenu(position, account),
+                    onLongPress: (position) {
+                      AppHaptics.medium();
+                      _showAccountContextMenu(position, account);
+                    },
                   ),
           ),
         );
@@ -848,7 +859,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         messenger.showSnackBar(
           SnackBar(
             content: Text('正在刷新「${account.name}」状态...'),
-            behavior: SnackBarBehavior.floating,
+            
             duration: const Duration(seconds: 2),
           ),
         );
@@ -862,7 +873,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
             content: Text(
               account.enabled ? '「${account.name}」已禁用' : '「${account.name}」已启用',
             ),
-            behavior: SnackBarBehavior.floating,
+            
             duration: const Duration(seconds: 2),
           ),
         );
@@ -874,24 +885,13 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
   Future<void> _visitSite(Account account) async {
     // Disabled accounts require confirmation.
     if (!account.enabled) {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showConfirmDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('访问站点'),
-          content: Text('账号「${account.name}」已禁用，确定要访问 ${account.baseUrl} 吗？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('取消'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('访问'),
-            ),
-          ],
-        ),
+        title: '访问站点',
+        content: '账号「${account.name}」已禁用,确定要访问 ${account.baseUrl} 吗?',
+        confirmText: '访问',
       );
-      if (confirmed != true || !mounted) return;
+      if (!confirmed || !mounted) return;
     }
 
     final useInApp = ref.read(useInAppBrowserProvider);
@@ -908,24 +908,13 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
 
   /// Shows a confirmation dialog before performing a swipe-to-check-in.
   Future<bool?> _confirmCheckIn(BuildContext context, Account account) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('手动签到'),
-        content: Text('确定要为「${account.name}」执行签到吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('确认签到'),
-          ),
-        ],
-      ),
+      title: '手动签到',
+      content: '确定要为「${account.name}」执行签到吗?',
+      confirmText: '确认签到',
     );
-    if (confirmed == true) {
+    if (confirmed) {
       _performCheckIn(account);
     }
     return false;
@@ -946,7 +935,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           messenger.showSnackBar(
             SnackBar(
               content: Text('「${account.name}」暂无签到任务'),
-              behavior: SnackBarBehavior.floating,
+              
             ),
           );
           return;
@@ -966,7 +955,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           messenger.showSnackBar(
             SnackBar(
               content: Text('「${account.name}」签到未执行'),
-              behavior: SnackBarBehavior.floating,
+              
             ),
           );
           return;
@@ -983,7 +972,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         messenger.showSnackBar(
           SnackBar(
             content: Text(msg),
-            behavior: SnackBarBehavior.floating,
+            
             duration: const Duration(seconds: 3),
           ),
         );
@@ -993,7 +982,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         messenger.showSnackBar(
           SnackBar(
             content: Text('「${account.name}」签到异常：$e'),
-            behavior: SnackBarBehavior.floating,
+            
           ),
         );
       }
@@ -1005,24 +994,14 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
     WidgetRef ref,
     Account account,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除账号'),
-        content: Text('确定要删除「${account.name}」吗？此操作无法撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      title: '删除账号',
+      content: '确定要删除「${account.name}」吗?此操作无法撤销。',
+      confirmText: '删除',
+      isDestructive: true,
     );
-    if (confirmed == true) {
+    if (confirmed) {
       final deletedId = account.id;
       ref.read(accountsProvider.notifier).delete(deletedId);
       // Clear wide-screen selection if the deleted account was selected.
@@ -1075,24 +1054,14 @@ class _AccountsDetailPanelState extends ConsumerState<_AccountsDetailPanel> {
   }
 
   Future<void> _onDelete(Account account) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('删除账号'),
-        content: Text('确定要删除「${account.name}」吗？此操作无法撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      title: '删除账号',
+      content: '确定要删除「${account.name}」吗?此操作无法撤销。',
+      confirmText: '删除',
+      isDestructive: true,
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
 
     final deletedId = account.id;
     ref.read(accountsProvider.notifier).delete(deletedId);

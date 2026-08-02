@@ -344,14 +344,14 @@ class _StatusDotState extends ConsumerState<_StatusDot>
 ///
 /// Pure function (kept at top-level for easy unit testing).
 Color _resolveDotColor(Account account, ReachabilityRecord? record) {
-  if (!account.enabled) return const Color(0xFF94A3B8); // slate-400, disabled
+  if (!account.enabled) return StatusColors.neutral; // disabled
   if (record != null && record.status == ReachabilityStatus.fail) {
-    return const Color(0xFFEF4444); // red-500, site unreachable
+    return StatusColors.error; // site unreachable
   }
   if (account.balance != null && account.balance! <= 1.0) {
-    return const Color(0xFFF97316); // orange-500, low balance
+    return StatusColors.warning; // low balance
   }
-  return const Color(0xFF10B981); // emerald-500, healthy
+  return StatusColors.success; // healthy
 }
 
 /// Resolves the check-in status icon for an account.
@@ -380,11 +380,11 @@ Color _resolveDotColor(Account account, ReachabilityRecord? record) {
 
   // API status is the single source of truth.
   if (apiCheckInStatusToday == true) {
-    return (icon: Icons.check_circle, color: const Color(0xFF10B981));
+    return (icon: Icons.check_circle, color: StatusColors.success);
   }
 
   // Not checked in today (or status unknown).
-  return (icon: Icons.cancel, color: const Color(0xFFEF4444));
+  return (icon: Icons.cancel, color: StatusColors.error);
 }
 
 /// Right-side column showing balance and status text.
@@ -446,7 +446,7 @@ class _BalanceColumn extends StatelessWidget {
     if (account.balance != null && account.balance! <= 1.0) {
       return colorScheme.error;
     }
-    return const Color(0xFF059669); // emerald-600
+    return StatusColors.success;
   }
 
   String _formatBalance(double value) {

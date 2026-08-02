@@ -227,7 +227,7 @@ class _ProxyConfigSectionState extends ConsumerState<ProxyConfigSection> {
         backgroundColor: isError
             ? colors.errorContainer
             : colors.primaryContainer.withValues(alpha: 0.9),
-        behavior: SnackBarBehavior.floating,
+        
         duration: const Duration(seconds: 3),
       ),
     );

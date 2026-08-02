@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/network/proxy_config.dart';
 import '../../../../core/network/proxy_test_service.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../domain/entities/global_proxy_setting.dart';
 import '../providers/global_proxy_providers.dart';
@@ -240,7 +241,7 @@ class _NetworkProxySettingsPageState
         backgroundColor: isError
             ? colors.errorContainer
             : colors.primaryContainer.withValues(alpha: 0.9),
-        behavior: SnackBarBehavior.floating,
+        
         duration: const Duration(seconds: 3),
       ),
     );
@@ -256,24 +257,13 @@ class _NetworkProxySettingsPageState
   }
 
   Future<bool> _confirmDiscardChanges() async {
-    final result = await showDialog<bool>(
+    return showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('放弃未保存的更改？'),
-        content: const Text('你有尚未保存的修改，离开将会丢失。确定继续？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('放弃'),
-          ),
-        ],
-      ),
+      title: '放弃未保存的更改?',
+      content: '你有尚未保存的修改,离开将会丢失。确定继续?',
+      confirmText: '放弃',
+      isDestructive: true,
     );
-    return result ?? false;
   }
 
   @override

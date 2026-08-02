@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/app_loading_state.dart';
 import '../../../dev_tools/request_logger/domain/entities/request_log_entry.dart';
 import '../../../dev_tools/request_logger/presentation/widgets/request_log_detail_placeholder.dart';
@@ -52,22 +53,12 @@ class PersistedRequestLogsPage extends ConsumerWidget {
   }
 
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('清空持久化记录'),
-        content: const Text('确定清空所有持久化的请求记录吗？此操作不可恢复。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
-          ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('清空'),
-          ),
-        ],
-      ),
+      title: '清空持久化记录',
+      content: '确定清空所有持久化的请求记录吗?此操作不可恢复。',
+      confirmText: '清空',
+      isDestructive: true,
     );
     if (confirmed != true) return;
     await ref.read(checkInRequestLogLocalDataSourceProvider).deleteAll();

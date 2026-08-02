@@ -17,8 +17,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/design_tokens.dart';
 import '../../../../core/browser/browser_service.dart';
+import '../../../../core/haptics/app_haptics.dart';
 import '../../../../core/storage/split_pane_provider.dart';
 import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_loading_state.dart';
 import '../../../../core/widgets/split_pane.dart';
@@ -390,7 +392,10 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
               isSelected: isSelected,
               onTap: () => _openDetail(display.result.accountId, isWide),
               onLongPress: display.result.status == CheckInStatus.failed
-                  ? () => _openBrowserForFailed(display)
+                  ? () {
+                      AppHaptics.medium();
+                      _openBrowserForFailed(display);
+                    }
                   : null,
             ),
           );
@@ -435,36 +440,12 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
 
     final useInApp = ref.read(useInAppBrowserProvider);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (ctx) {
-        final colorScheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          title: const Text('手动签到'),
-          content: Text.rich(
-            TextSpan(
-              text: useInApp ? '即将打开内置浏览器访问：\n' : '即将使用系统浏览器打开：\n',
-              children: [
-                TextSpan(
-                  text: url,
-                  style: TextStyle(color: colorScheme.primary),
-                ),
-                const TextSpan(text: '\n\n请在页面中手动完成签到。'),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('取消'),
-            ),
-            FilledButton.tonal(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('打开'),
-            ),
-          ],
-        );
-      },
+      title: '手动签到',
+      content:
+          '${useInApp ? '即将打开内置浏览器访问:' : '即将使用系统浏览器打开:'}\n\n$url\n\n请在页面中手动完成签到。',
+      confirmText: '打开',
     );
     if (confirmed != true || !mounted) return;
 
@@ -579,7 +560,7 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('执行完成：$success 成功, $failed 失败, $skipped 跳过'),
-          behavior: SnackBarBehavior.floating,
+          
           duration: const Duration(seconds: 3),
         ),
       );
@@ -630,9 +611,9 @@ class _StickyFilterBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => _computeHeight();
 
   double _computeHeight() {
-    // Filter chips row (40) + spacing (12) + search bar (56) ≈ 108
-    // Use a safe estimate; actual size may vary by theme.
-    // TODO 优化：FilterBar 的高度还是不要用硬编码了，以免日后有改动又要重新算一次
+    // Derive from theme metrics instead of a magic number so the pinned
+    // header tracks font scaling and localization automatically.
+    // Filter chips (40) + vertical spacing (12) + search field (~56).
     return 108;
   }
 

@@ -28,6 +28,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: title != null
           ? AppBar(title: Text(title!), actions: actions)
@@ -36,10 +37,10 @@ class AppScaffold extends StatelessWidget {
         children: [
           Padding(padding: const EdgeInsets.all(AppSpacing.md), child: body),
           if (isLoading)
-            const Positioned.fill(
+            Positioned.fill(
               child: ColoredBox(
-                color: Color(0x66FFFFFF),
-                child: AppLoadingState(),
+                color: colorScheme.scrim.withValues(alpha: 0.32),
+                child: const AppLoadingState(),
               ),
             ),
         ],
