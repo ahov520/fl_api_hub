@@ -79,6 +79,8 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
           # Fail fast on a malformed/corrupted secret instead of surfacing as a
@@ -86,6 +88,16 @@ jobs:
           file android/app/keystore.jks
           if ! keytool -list -keystore android/app/keystore.jks -storepass "$ANDROID_STORE_PASSWORD" > /dev/null 2>&1; then
             echo "::error::keystore.jks decoded from ANDROID_KEYSTORE_BASE64 is not a valid JKS (bad/corrupted secret?). Re-export with: base64 -w0 keystore.jks"
+            exit 1
+          fi
+          # Also verify the key password + alias, otherwise a mismatch only
+          # surfaces at :app:packageRelease as "Given final block not properly
+          # padded" after the whole compile.
+          if ! keytool -keypasswd -keystore android/app/keystore.jks \
+              -storepass "$ANDROID_STORE_PASSWORD" \
+              -alias "$ANDROID_KEY_ALIAS" -keypass "$ANDROID_KEY_PASSWORD" \
+              -new "$ANDROID_KEY_PASSWORD" > /dev/null 2>&1; then
+            echo "::error::Key alias/password do not match the keystore. Check ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD."
             exit 1
           fi
 
