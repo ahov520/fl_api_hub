@@ -28,6 +28,7 @@ import '../../../settings/presentation/providers/browser_providers.dart';
 import '../../domain/entities/check_in_result.dart';
 import '../../domain/entities/check_in_task.dart';
 import '../providers/check_in_providers.dart';
+import '../widgets/balance_overview_card.dart';
 import '../widgets/check_in_detail_view.dart';
 import '../widgets/check_in_filter_bar.dart';
 import '../widgets/check_in_result_card.dart';
@@ -268,6 +269,8 @@ class _CheckInPageState extends ConsumerState<CheckInPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const BalanceOverviewCard(),
+                  const SizedBox(height: AppSpacing.sm),
                   CheckInSummaryCard(stats: stats),
                   const SizedBox(height: AppSpacing.sm),
                   CheckInStatsGrid(stats: stats),
